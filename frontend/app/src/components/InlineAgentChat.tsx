@@ -142,7 +142,7 @@ Here are your personalized next steps:`;
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-      className="relative mx-auto mt-10 w-full max-w-7xl overflow-hidden rounded-3xl border border-white/10 bg-[#101014]/95 p-6 shadow-2xl lg:p-8"
+      className="relative mx-auto mt-10 flex min-h-[460px] w-full max-w-7xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#101014]/95 p-6 shadow-2xl lg:min-h-[560px] lg:p-8 xl:min-h-[600px] xl:p-10 2xl:min-h-[620px]"
       style={{
         boxShadow: '0 24px 80px rgba(0,0,0,0.35), 0 0 32px rgba(17,115,188,0.06)',
       }}
@@ -185,10 +185,10 @@ Here are your personalized next steps:`;
         </button>
       </div>
 
-      <div className="mt-6 space-y-8">
+      <div className="mt-8 flex flex-1 flex-col">
         <div
           ref={messagesContainerRef}
-          className="max-h-[22rem] overflow-y-auto rounded-2xl border border-white/[0.06] bg-black/20 px-4 py-5 lg:px-5"
+          className="max-h-[24rem] min-h-[140px] overflow-y-auto rounded-2xl border border-white/[0.06] bg-black/20 p-5 lg:min-h-[150px] lg:p-6"
         >
           <div className="space-y-4">
             {session?.messages.map((msg) => (
@@ -206,7 +206,7 @@ Here are your personalized next steps:`;
                 )}
                 <div
                   className={cn(
-                    'max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-relaxed lg:max-w-[900px]',
+                    'max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-relaxed lg:max-w-[1100px]',
                     msg.role === 'user'
                       ? 'rounded-br-md bg-gff-gradient text-white'
                       : 'rounded-bl-md border border-white/[0.06] bg-white/[0.05] text-white/90'
@@ -327,8 +327,8 @@ Here are your personalized next steps:`;
         </div>
 
         {state === 'welcome' && (
-          <div className="mt-8">
-            <span className="mb-4 block text-[10px] uppercase tracking-wider text-muted-text">Quick Actions</span>
+          <div className="mt-12">
+            <span className="mb-5 block text-[10px] uppercase tracking-wider text-muted-text">Quick Actions</span>
             <div className="flex flex-wrap gap-3">
               {quickActionChips.map((chip) => (
                 <button
@@ -343,7 +343,9 @@ Here are your personalized next steps:`;
           </div>
         )}
 
-        <div className="mt-8 border-t border-white/[0.06] pt-6">
+        <div className="min-h-8 flex-1" />
+
+        <div className="mt-8 border-t border-white/[0.06] pt-8">
           <div className="flex flex-col gap-3 sm:flex-row">
             <input
               type="text"
@@ -351,12 +353,12 @@ Here are your personalized next steps:`;
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder={state === 'welcome' ? 'Describe your challenge or ask anything...' : 'Continue the conversation...'}
-              className="flex-1 rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-muted-text/50 focus:border-core-blue/40 focus:outline-none transition-colors"
+              className="h-14 flex-1 rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 text-sm text-white placeholder:text-muted-text/50 transition-colors focus:border-core-blue/40 focus:outline-none"
             />
             <button
               onClick={handleSend}
               disabled={!input.trim() || state === 'loading'}
-              className="flex h-12 w-full items-center justify-center rounded-xl bg-gff-gradient px-5 text-white transition-all hover:shadow-[0_0_20px_rgba(17,115,188,0.3)] disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
+              className="flex h-14 w-full items-center justify-center rounded-xl bg-gff-gradient px-5 text-white transition-all hover:shadow-[0_0_20px_rgba(17,115,188,0.3)] disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
             >
               <Send className="h-4 w-4" />
             </button>

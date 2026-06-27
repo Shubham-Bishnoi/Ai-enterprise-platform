@@ -83,7 +83,7 @@ export default function TalkToAgent() {
   }, [showInlineChat, chatVersion]);
 
   return (
-    <section id="agent" className="py-20 lg:py-24">
+    <section id="agent" className="pt-20 pb-16 lg:pt-24 lg:pb-20">
       <div className="w-[95vw] max-w-[1800px] mx-auto px-8">
         {/* Header */}
         <motion.div
