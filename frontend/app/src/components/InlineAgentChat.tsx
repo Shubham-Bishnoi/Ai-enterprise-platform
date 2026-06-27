@@ -142,7 +142,7 @@ Here are your personalized next steps:`;
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-      className="relative mx-auto mt-10 flex min-h-[460px] w-full max-w-7xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#101014]/95 p-6 shadow-2xl lg:min-h-[560px] lg:p-8 xl:min-h-[600px] xl:p-10 2xl:min-h-[620px]"
+      className="relative mx-auto mt-10 flex min-h-[560px] w-full max-w-7xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#101014]/95 p-6 shadow-2xl lg:min-h-[600px] lg:p-8 xl:min-h-[620px] xl:p-10"
       style={{
         boxShadow: '0 24px 80px rgba(0,0,0,0.35), 0 0 32px rgba(17,115,188,0.06)',
       }}
@@ -188,7 +188,7 @@ Here are your personalized next steps:`;
       <div className="mt-8 flex flex-1 flex-col">
         <div
           ref={messagesContainerRef}
-          className="max-h-[24rem] min-h-[140px] overflow-y-auto rounded-2xl border border-white/[0.06] bg-black/20 p-5 lg:min-h-[150px] lg:p-6"
+          className="flex-1 overflow-y-auto rounded-2xl border border-white/[0.06] bg-black/20 p-5 min-h-[260px] lg:min-h-[300px] xl:min-h-[320px] lg:p-6"
         >
           <div className="space-y-4">
             {session?.messages.map((msg) => (
@@ -326,27 +326,25 @@ Here are your personalized next steps:`;
           </div>
         </div>
 
-        {state === 'welcome' && (
-          <div className="mt-12">
-            <span className="mb-5 block text-[10px] uppercase tracking-wider text-muted-text">Quick Actions</span>
-            <div className="flex flex-wrap gap-3">
-              {quickActionChips.map((chip) => (
-                <button
-                  key={chip.id}
-                  onClick={() => handleQuickAction(chip.prompt)}
-                  className="rounded-full border border-white/[0.08] bg-white/[0.05] px-3 py-1.5 text-[11px] text-white/70 transition-all duration-300 hover:border-white/[0.15] hover:bg-white/[0.10] hover:text-white"
-                >
-                  {chip.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="min-h-8 flex-1" />
-
         <div className="mt-8 border-t border-white/[0.06] pt-8">
-          <div className="flex flex-col gap-3 sm:flex-row">
+          {state === 'welcome' && (
+            <div>
+              <span className="mb-4 block text-[10px] uppercase tracking-wider text-muted-text">Quick Actions</span>
+              <div className="flex flex-wrap gap-3">
+                {quickActionChips.map((chip) => (
+                  <button
+                    key={chip.id}
+                    onClick={() => handleQuickAction(chip.prompt)}
+                    className="rounded-full border border-white/[0.08] bg-white/[0.05] px-3 py-1.5 text-[11px] text-white/70 transition-all duration-300 hover:border-white/[0.15] hover:bg-white/[0.10] hover:text-white"
+                  >
+                    {chip.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className={cn('flex flex-col gap-3 sm:flex-row', state === 'welcome' ? 'mt-6' : '')}>
             <input
               type="text"
               value={input}
