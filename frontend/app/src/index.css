@@ -180,6 +180,15 @@
     color: white;
   }
 
+  .blueprint-email-input:-webkit-autofill,
+  .blueprint-email-input:-webkit-autofill:hover,
+  .blueprint-email-input:-webkit-autofill:focus {
+    -webkit-text-fill-color: rgba(255, 255, 255, 0.9);
+    transition: background-color 9999s ease-in-out 0s;
+    box-shadow: 0 0 0 1000px #17171b inset;
+    caret-color: rgba(255, 255, 255, 0.9);
+  }
+
   ::-webkit-scrollbar {
     width: 6px;
   }
