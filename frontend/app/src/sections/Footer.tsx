@@ -1,10 +1,7 @@
 import { motion } from 'framer-motion';
 import { Linkedin, Twitter, Mail, Youtube, Instagram, MapPin, Phone } from 'lucide-react';
-
-const footerLinks = {
-  Information: ['Responsible AI', 'Careers', 'Resources', 'About Us', 'Contact Us', 'Privacy Policy', 'Terms & Conditions'],
-  Service: ['AI Chips', 'Authentication', 'Edtech', 'Femtech', 'TravelTech', 'Proptech'],
-};
+import { Link } from 'react-router';
+import { footerColumns, siteContainerClass } from '@/lib/siteContent';
 
 const socials = [
   { icon: Linkedin, href: '#', label: 'LinkedIn' },
@@ -16,16 +13,16 @@ const socials = [
 
 export default function Footer() {
   return (
-    <footer className="py-16 px-6 lg:px-16 border-t border-white/5">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+    <footer className="border-t border-white/5 bg-[#07070a] py-16">
+      <div className={siteContainerClass}>
+        <div className="grid grid-cols-1 gap-12 xl:grid-cols-[1.2fr_repeat(5,minmax(0,1fr))] mb-12">
           {/* Logo & Description */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="lg:col-span-1"
+            className="max-w-sm"
           >
             <div className="flex items-center gap-2 mb-4">
               <div className="relative w-8 h-8 flex items-center justify-center">
@@ -49,7 +46,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-sm text-muted-text leading-relaxed mb-6">
-              Building Intelligent Enterprises for the Agentic Era. GFF AI is a global AI consulting, engineering, and transformation company.
+              Building intelligent enterprises for the agentic era through strategy, engineering, governance, platforms, and managed AI operations.
             </p>
 
             {/* Social Icons */}
@@ -68,54 +65,52 @@ export default function Footer() {
           </motion.div>
 
           {/* Links */}
-          {Object.entries(footerLinks).map(([title, links], colIdx) => (
+          {footerColumns.map((column, colIdx) => (
             <motion.div
-              key={title}
+              key={column.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: (colIdx + 1) * 0.1 }}
+              transition={{ duration: 0.6, delay: (colIdx + 1) * 0.08 }}
             >
-              <h4 className="text-sm font-display font-bold text-white mb-4">{title}</h4>
+              <h4 className="text-sm font-display font-bold text-white mb-4">{column.title}</h4>
               <ul className="space-y-2.5">
-                {links.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-sm text-muted-text hover:text-white transition-colors duration-300">
-                      {link}
-                    </a>
+                {column.links.map((link) => (
+                  <li key={link.label}>
+                    <Link to={link.to} className="text-sm text-muted-text hover:text-white transition-colors duration-300">
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
             </motion.div>
           ))}
-
-          {/* Contact Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            <h4 className="text-sm font-display font-bold text-white mb-4">Contact Info</h4>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-core-blue mt-0.5 flex-shrink-0" />
-                <span className="text-sm text-muted-text">
-                  71 Pennington Lane<br />
-                  Vernon Rockville, CT 06066
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-core-blue flex-shrink-0" />
-                <span className="text-sm text-muted-text">thefactoryai@gmail.com</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-core-blue flex-shrink-0" />
-                <span className="text-sm text-muted-text">+91-755-507-8740</span>
-              </div>
-            </div>
-          </motion.div>
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.25 }}
+          className="mb-10 grid gap-4 rounded-[28px] border border-white/[0.08] bg-[#101014]/80 p-5 backdrop-blur-xl md:grid-cols-3 lg:p-6"
+        >
+          <div className="flex items-start gap-3">
+            <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-core-blue" />
+            <span className="text-sm text-muted-text">
+              71 Pennington Lane
+              <br />
+              Vernon Rockville, CT 06066
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Mail className="h-4 w-4 flex-shrink-0 text-core-blue" />
+            <span className="text-sm text-muted-text">thefactoryai@gmail.com</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Phone className="h-4 w-4 flex-shrink-0 text-core-blue" />
+            <span className="text-sm text-muted-text">+91-755-507-8740</span>
+          </div>
+        </motion.div>
 
         {/* Copyright */}
         <div className="pt-8 border-t border-white/5 text-center">

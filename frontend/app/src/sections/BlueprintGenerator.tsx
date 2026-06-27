@@ -273,7 +273,8 @@ export default function BlueprintGenerator() {
   };
 
   return (
-    <section id="blueprint" className="relative isolate px-6 pb-24 pt-16 lg:px-16 lg:pb-28 lg:pt-20">
+    <section id="blueprint-generator" className="relative isolate px-6 pb-24 pt-16 lg:px-16 lg:pb-28 lg:pt-20">
+      <div id="blueprint" className="scroll-mt-28" />
       <div className="mx-auto w-full max-w-[1280px]">
         {/* Section Header */}
         <motion.div
