@@ -1,0 +1,5 @@
+.DS_Store
+frontend/app/node_modules/
+frontend/app/dist/
+frontend/gffai.zip
+*.log
