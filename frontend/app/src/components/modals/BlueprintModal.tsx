@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
@@ -31,12 +31,20 @@ export function BlueprintModal({ isOpen, onClose, formData }: BlueprintModalProp
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'opportunities' | 'roadmap' | 'architecture' | 'governance'>('overview');
   const [animatedScore, setAnimatedScore] = useState(0);
+  const resultsContentRef = useRef<HTMLDivElement | null>(null);
+  const resetResultsScroll = (behavior: ScrollBehavior = 'auto') => {
+    resultsContentRef.current?.scrollTo({
+      top: 0,
+      behavior,
+    });
+  };
 
   useEffect(() => {
     if (isOpen && formData.industry) {
       setIsGenerating(true);
       setResult(null);
       setAnimatedScore(0);
+      setActiveTab('overview');
 
       const timer = setTimeout(() => {
         const blueprint = generateMockBlueprint(formData);
@@ -61,6 +69,25 @@ export function BlueprintModal({ isOpen, onClose, formData }: BlueprintModalProp
       return () => clearTimeout(timer);
     }
   }, [isOpen, formData]);
+
+  useEffect(() => {
+    if (!result || isGenerating) return;
+
+    const frame = requestAnimationFrame(() => {
+      resetResultsScroll('auto');
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [activeTab, result, isGenerating]);
+
+  const handleTabChange = (tab: typeof activeTab) => {
+    resetResultsScroll('auto');
+    setActiveTab(tab);
+
+    requestAnimationFrame(() => {
+      resetResultsScroll('auto');
+    });
+  };
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -252,7 +279,7 @@ export function BlueprintModal({ isOpen, onClose, formData }: BlueprintModalProp
                     ].map((tab) => (
                       <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                        onClick={() => handleTabChange(tab.id as typeof activeTab)}
                         className={cn(
                           'flex-1 flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-medium transition-all duration-300',
                           activeTab === tab.id
@@ -268,7 +295,7 @@ export function BlueprintModal({ isOpen, onClose, formData }: BlueprintModalProp
                 </div>
 
                 {/* Tab Content */}
-                <div className="px-8 pb-8 overflow-y-auto max-h-[50vh]">
+                <div ref={resultsContentRef} className="px-8 pb-14 overflow-y-auto max-h-[56vh] lg:max-h-[58vh]">
                   <AnimatePresence mode="wait">
                     {activeTab === 'overview' && (
                       <OverviewTab key="overview" result={result} />
@@ -288,9 +315,9 @@ export function BlueprintModal({ isOpen, onClose, formData }: BlueprintModalProp
                   </AnimatePresence>
 
                   {/* Next Actions */}
-                  <div className="mt-6 pt-6 border-t border-white/[0.08]">
+                  <div className="mt-8 border-t border-white/[0.08] pb-8 pt-6">
                     <h4 className="text-sm font-display font-bold text-white mb-3">Recommended Next Actions</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="mb-4 grid grid-cols-1 gap-3 pb-4 sm:grid-cols-3">
                       {result.nextActions.map((action, i) => (
                         <motion.button
                           key={i}
