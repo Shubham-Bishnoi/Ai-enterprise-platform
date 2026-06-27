@@ -16,19 +16,40 @@ function ScrollManager() {
   const location = useLocation();
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      if (location.hash) {
-        const element = document.getElementById(decodeURIComponent(location.hash.slice(1)));
-        if (element) {
+    if (!location.hash) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    let cancelled = false;
+    let attempts = 0;
+    const targetId = decodeURIComponent(location.hash.slice(1));
+
+    const scrollToHashTarget = () => {
+      if (cancelled) return;
+
+      const element = document.getElementById(targetId);
+      if (element) {
+        requestAnimationFrame(() => {
           element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          return;
-        }
+        });
+        return;
       }
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 0);
+      attempts += 1;
+      if (attempts < 20) {
+        window.setTimeout(scrollToHashTarget, 50);
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
 
-    return () => window.clearTimeout(timer);
+    const timer = window.setTimeout(scrollToHashTarget, 0);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
   }, [location.pathname, location.hash]);
 
   return null;

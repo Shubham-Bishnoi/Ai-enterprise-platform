@@ -1,12 +1,15 @@
 import { useEffect } from 'react';
 import Hero from '../sections/Hero';
-import AIFoundryProcess from '../sections/AIFoundryProcess';
+import QuickSearch from '../sections/QuickSearch';
+import GarageFoundryFactoryJourney from '../sections/GarageFoundryFactoryJourney';
 import WhatWeBuild from '../sections/WhatWeBuild';
-import IndustrySolutions from '../sections/IndustrySolutions';
+import InteractiveExperience from '../sections/InteractiveExperience';
+import GlobalPresence from '../sections/GlobalPresence';
+import ClientSuccess from '../sections/ClientSuccess';
+import LiveDashboard from '../sections/LiveDashboard';
+import LatestResearch from '../sections/LatestResearch';
 import TalkToAgent from '../sections/TalkToAgent';
 import BlueprintGenerator from '../sections/BlueprintGenerator';
-import AILabs from '../sections/AILabs';
-import Contact from '../sections/Contact';
 
 export default function Home() {
   useEffect(() => {
@@ -21,11 +24,14 @@ export default function Home() {
       <Hero />
       <TalkToAgent />
       <BlueprintGenerator />
-      <AIFoundryProcess />
+      <QuickSearch />
+      <GarageFoundryFactoryJourney />
       <WhatWeBuild />
-      <IndustrySolutions />
-      <AILabs />
-      <Contact />
+      <InteractiveExperience />
+      <GlobalPresence />
+      <ClientSuccess />
+      <LiveDashboard />
+      <LatestResearch />
     </main>
   );
 }
