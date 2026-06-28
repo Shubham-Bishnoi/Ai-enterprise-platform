@@ -103,11 +103,11 @@ export default function Hero() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={loaded ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.8, delay: 0.9 }}
-                  className="mt-8 flex max-w-full flex-wrap items-center gap-3 overflow-visible lg:gap-4 2xl:flex-nowrap"
+                  className="mt-8 flex max-w-full flex-wrap items-center gap-3 overflow-visible lg:flex-nowrap lg:gap-2.5 xl:gap-3"
                 >
                   <button
                     onClick={() => document.querySelector('#blueprint')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="group flex h-12 min-w-fit w-full max-w-full items-center justify-center gap-2 rounded-2xl bg-gff-gradient px-5 text-sm text-white transition-all duration-300 hover-gff-glow sheen-btn sm:w-auto sm:justify-start lg:px-6 lg:text-base"
+                    className="group flex h-11 w-full max-w-full shrink-0 items-center justify-center gap-2 rounded-2xl bg-gff-gradient px-4 text-[13px] text-white transition-all duration-300 hover-gff-glow sheen-btn sm:w-auto sm:justify-start lg:w-auto lg:px-4 xl:px-5 xl:text-sm"
                   >
                     <FileText className="h-4 w-4" />
                     <span className="whitespace-nowrap">Generate My Enterprise AI Blueprint</span>
@@ -115,7 +115,7 @@ export default function Hero() {
                   </button>
                   <button
                     onClick={() => document.querySelector('#foundry-process')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="group flex h-12 min-w-fit w-full max-w-full items-center justify-center gap-2 rounded-2xl px-5 text-sm text-white transition-all duration-300 btn-secondary sm:w-auto sm:justify-start lg:px-6 lg:text-base"
+                    className="group flex h-11 w-full max-w-full shrink-0 items-center justify-center gap-2 rounded-2xl px-4 text-[13px] text-white transition-all duration-300 btn-secondary sm:w-auto sm:justify-start lg:w-auto lg:px-4 xl:px-5 xl:text-sm"
                   >
                     <Play className="h-4 w-4" />
                     <span className="whitespace-nowrap">Experience GFF AI Live</span>
@@ -125,7 +125,7 @@ export default function Hero() {
                       const el = document.getElementById('talk-to-agent-trigger');
                       if (el) el.click();
                     }}
-                    className="group flex h-12 min-w-fit w-full max-w-full items-center justify-center gap-2 rounded-2xl px-5 text-sm text-white transition-all duration-300 btn-secondary sm:w-auto sm:justify-start lg:px-6 lg:text-base"
+                    className="group flex h-11 w-full max-w-full shrink-0 items-center justify-center gap-2 rounded-2xl px-4 text-[13px] text-white transition-all duration-300 btn-secondary sm:w-auto sm:justify-start lg:w-auto lg:px-4 xl:px-5 xl:text-sm"
                   >
                     <MessageSquare className="h-4 w-4" />
                     <span className="whitespace-nowrap">Talk to GFF AI</span>

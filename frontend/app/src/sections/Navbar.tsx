@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Sun, Moon } from 'lucide-react';
 import { Link, NavLink, useLocation } from 'react-router';
-import { primaryNavItems } from '@/lib/siteContent';
+import { useTheme } from '../context/ThemeContext';
+import { primaryNavItems } from '../lib/siteContent';
 
 export default function Navbar() {
   const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
   const desktopNavItems = useMemo(
     () => primaryNavItems.filter((item) => !item.mobileOnly && item.label !== 'Contact'),
     []
@@ -23,26 +26,27 @@ export default function Navbar() {
     setMobileOpen(false);
   }, [location.pathname, location.hash]);
 
+  const navBackdrop = scrolled
+    ? 'bg-[var(--bg-primary)]/70 backdrop-blur-2xl border-b border-[var(--border-default)]'
+    : 'bg-transparent';
+
   return (
     <>
       <motion.nav
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
-            ? 'bg-[#0D0D0D]/70 backdrop-blur-2xl border-b border-white/[0.06]'
-            : 'bg-transparent'
-          }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${navBackdrop}`}
         style={scrolled ? {
           WebkitBackdropFilter: 'blur(24px)',
-          boxShadow: '0 4px 30px rgba(0,0,0,0.3), 0 0 40px rgba(17,115,188,0.04)',
+          boxShadow: '0 4px 30px rgba(0,0,0,0.15), 0 0 40px rgba(17,115,188,0.03)',
         } : {}}
       >
         <div className="mx-auto max-w-[1740px] px-6 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
             <motion.div
-              className="flex items-center gap-2 group"
+              className="flex items-center gap-2 group flex-shrink-0"
               whileHover={{ scale: 1.02 }}
             >
               <Link
@@ -54,7 +58,7 @@ export default function Navbar() {
                 }}
                 className="flex items-center gap-2"
               >
-                <div className="relative w-9 h-9 flex items-center justify-center">
+                <div className="relative w-9 h-9 flex items-center justify-center flex-shrink-0">
                   <svg viewBox="0 0 40 40" className="w-full h-full">
                     <defs>
                       <linearGradient id="logoGrad" x1="0%" y1="50%" x2="100%" y2="50%">
@@ -71,21 +75,21 @@ export default function Navbar() {
                   </svg>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-white font-display font-bold text-lg leading-none tracking-tight">GFF AI</span>
-                  <span className="text-[10px] text-muted-text tracking-[0.2em] uppercase leading-none mt-0.5">Garage | Foundry | Factory</span>
+                  <span className="font-display font-bold text-lg leading-none tracking-tight" style={{ color: 'var(--text-primary)' }}>GFF AI</span>
+                  <span className="text-[10px] tracking-[0.2em] uppercase leading-none mt-0.5" style={{ color: 'var(--text-secondary)' }}>Garage | Foundry | Factory</span>
                 </div>
               </Link>
             </motion.div>
 
-            {/* Desktop Nav */}
-            <div className="hidden min-[1180px]:flex items-center gap-0.5">
+            {/* Desktop Nav - hidden below 1180px */}
+            <div className="hidden min-[1180px]:flex flex-1 min-w-0 items-center justify-center gap-1 px-4 xl:gap-2 2xl:gap-3">
               {desktopNavItems.map((link) => (
                 <NavLink
                   key={link.label}
                   to={link.to}
                   end={link.end}
                   className={({ isActive }) =>
-                    `group relative rounded-xl px-3 py-2 text-[13px] transition-colors duration-300 xl:px-4 xl:text-sm ${isActive ? 'text-white' : 'text-muted-text hover:text-white'
+                    `group relative whitespace-nowrap rounded-xl px-2 py-2 text-[12px] leading-none transition-colors duration-300 xl:px-2.5 xl:text-[13px] 2xl:px-3 2xl:text-sm ${isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                     }`
                   }
                 >
@@ -103,10 +107,42 @@ export default function Navbar() {
             </div>
 
             {/* Right Actions */}
-            <div className="hidden min-[1180px]:flex items-center gap-3">
+            <div className="hidden min-[1180px]:flex shrink-0 items-center gap-2.5">
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+                className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--border-default)] bg-[var(--chip-bg)] text-[var(--text-secondary)] transition-all duration-300 hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]"
+              >
+                <AnimatePresence mode="wait" initial={false}>
+                  {theme === 'dark' ? (
+                    <motion.div
+                      key="moon"
+                      initial={{ rotate: -90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      exit={{ rotate: 90, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Moon className="h-4 w-4" />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="sun"
+                      initial={{ rotate: 90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      exit={{ rotate: -90, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Sun className="h-4 w-4" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </button>
+
               <Link
                 to="/portal"
-                className="rounded-2xl border border-white/12 bg-white/[0.03] px-4 py-2 text-sm text-white/85 transition-all duration-300 hover:border-white/20 hover:bg-white/[0.06]"
+                className="rounded-2xl border border-[var(--border-default)] bg-[var(--chip-bg)] px-3.5 py-2 text-[13px] transition-all duration-300 hover:border-[var(--border-hover)] whitespace-nowrap xl:px-4 xl:text-sm"
+                style={{ color: 'var(--text-primary)' }}
               >
                 Client Login
               </Link>
@@ -117,7 +153,7 @@ export default function Navbar() {
               >
                 <Link
                   to="/contact"
-                  className="rounded-2xl bg-gff-gradient px-5 py-2.5 text-sm font-medium text-white sheen-btn transition-all duration-300 hover-gff-glow"
+                  className="rounded-2xl bg-gff-gradient px-4 py-2.5 text-[13px] font-medium text-white sheen-btn transition-all duration-300 hover-gff-glow whitespace-nowrap xl:px-5 xl:text-sm"
                 >
                   Book a Consultation
                 </Link>
@@ -125,15 +161,26 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Toggle */}
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="min-[1180px]:hidden p-2 text-white"
-              aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
-              aria-expanded={mobileOpen}
-              aria-controls="mobile-navigation"
-            >
-              {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
+            <div className="flex items-center gap-2 min-[1180px]:hidden">
+              {/* Mobile Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+                className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--border-default)] text-[var(--text-secondary)]"
+              >
+                {theme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+              </button>
+              <button
+                onClick={() => setMobileOpen(!mobileOpen)}
+                className="p-2"
+                aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                aria-expanded={mobileOpen}
+                aria-controls="mobile-navigation"
+                style={{ color: 'var(--text-primary)' }}
+              >
+                {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
           </div>
         </div>
       </motion.nav>
@@ -149,7 +196,7 @@ export default function Navbar() {
             id="mobile-navigation"
             className="fixed inset-0 z-40 pt-20"
             style={{
-              background: 'rgba(13,13,13,0.97)',
+              background: theme === 'dark' ? 'rgba(13,13,13,0.97)' : 'rgba(247,248,251,0.97)',
               backdropFilter: 'blur(40px)',
               WebkitBackdropFilter: 'blur(40px)',
             }}
@@ -166,7 +213,7 @@ export default function Navbar() {
                     to={link.to}
                     end={link.end}
                     className={({ isActive }) =>
-                      `text-2xl font-display transition-colors ${isActive ? 'text-white' : 'text-white hover-text-gradient'
+                      `text-2xl font-display transition-colors ${isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-primary)] hover-text-gradient'
                       }`
                     }
                   >
@@ -182,7 +229,8 @@ export default function Navbar() {
               >
                 <Link
                   to="/portal"
-                  className="rounded-2xl border border-white/12 bg-white/[0.03] px-8 py-3 text-white transition-all duration-300 hover:border-white/20 hover:bg-white/[0.06]"
+                  className="rounded-2xl border border-[var(--border-default)] bg-[var(--chip-bg)] px-8 py-3 transition-all duration-300"
+                  style={{ color: 'var(--text-primary)' }}
                 >
                   Client Login
                 </Link>
