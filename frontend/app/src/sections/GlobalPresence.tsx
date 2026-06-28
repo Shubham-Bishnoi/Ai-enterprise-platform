@@ -1,88 +1,220 @@
 import { motion } from 'framer-motion';
-import { MapPin } from 'lucide-react';
-import { GlassCard, SectionHeader } from '@/components/shared';
+import { MapPin, Globe, Radio } from 'lucide-react';
 import { globalPresenceLocations, siteContainerClass } from '@/lib/siteContent';
 
 const pinPositions = [
-  { left: '67%', top: '34%' },
-  { left: '56%', top: '49%' },
-  { left: '43%', top: '27%' },
-  { left: '79%', top: '71%' },
-  { left: '50%', top: '43%' },
-  { left: '18%', top: '33%' },
+  { left: '67%', top: '34%' },   // Singapore
+  { left: '56%', top: '49%' },   // India
+  { left: '43%', top: '27%' },   // London
+  { left: '79%', top: '71%' },   // Australia
+  { left: '50%', top: '43%' },   // Middle East
+  { left: '18%', top: '33%' },   // USA
 ];
 
 export default function GlobalPresence() {
   return (
-    <section id="global-presence" className="py-20 lg:py-24">
+    <section id="global-presence" className="relative py-20 lg:py-28 overflow-hidden">
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'radial-gradient(circle at 30% 50%, rgba(17,115,188,0.06), transparent 40%), radial-gradient(circle at 70% 80%, rgba(154,0,3,0.04), transparent 35%)',
+        }}
+      />
+
       <div className={siteContainerClass}>
-        <SectionHeader
-          eyebrow="Global Presence"
-          title="Global AI Transformation Presence"
-          subtitle="GFF AI operates across strategic regions with a Garage-Foundry-Factory delivery model."
-        />
+        {/* Header */}
+        <div className="text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-mono uppercase tracking-[0.24em]"
+            style={{ borderColor: 'var(--border-default)', backgroundColor: 'var(--chip-bg)', color: 'var(--text-secondary)' }}
+          >
+            <Globe className="h-3.5 w-3.5" />
+            Global Presence
+          </motion.div>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="font-display text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            Global AI Transformation <span className="text-gradient">Presence</span>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="mx-auto mt-4 max-w-2xl text-lg"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            GFF AI operates across strategic regions with a Garage-Foundry-Factory delivery model.
+          </motion.p>
+        </div>
 
-        <div className="mt-12 grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-          <GlassCard className="relative overflow-hidden rounded-[32px] border-white/[0.09] bg-[#0d0d10]/92 p-6 lg:p-8" glow="gradient">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(17,115,188,0.12),transparent_38%),radial-gradient(circle_at_30%_30%,rgba(192,60,133,0.12),transparent_24%)]" />
-            <div className="absolute inset-[12%] rounded-full border border-white/10" />
-            <div className="absolute inset-[20%] rounded-full border border-dashed border-white/10" />
-            <div className="absolute inset-[28%] rounded-full border border-white/10" />
-            <div className="absolute inset-[18%] rounded-full bg-[radial-gradient(circle_at_center,rgba(17,115,188,0.2),rgba(13,13,16,0.04)_55%,transparent_72%)] blur-sm" />
+        {/* Network Map Layout */}
+        <div className="mt-14 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+          {/* Map Visual */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="relative overflow-hidden rounded-[28px] border"
+            style={{
+              backgroundColor: 'var(--bg-glass)',
+              borderColor: 'var(--border-default)',
+              minHeight: '480px',
+            }}
+          >
+            <div
+              className="absolute inset-0"
+              style={{
+                background: 'radial-gradient(circle at center, rgba(17,115,188,0.12), transparent 38%), radial-gradient(circle at 30% 30%, rgba(192,60,133,0.10), transparent 24%)',
+              }}
+            />
 
-            <div className="relative flex min-h-[420px] items-center justify-center overflow-hidden rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01))]">
-              <div className="absolute inset-0 bg-[linear-gradient(transparent_95%,rgba(255,255,255,0.04)_100%),linear-gradient(90deg,transparent_95%,rgba(255,255,255,0.04)_100%)] bg-[size:38px_38px]" />
+            {/* Grid overlay */}
+            <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: 'linear-gradient(var(--border-default) 1px, transparent 1px), linear-gradient(90deg, var(--border-default) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
-              {globalPresenceLocations.map((location, index) => (
-                <div
-                  key={location.name}
-                  className="absolute"
-                  style={pinPositions[index]}
-                >
-                  <div className="flex flex-col items-center gap-2">
-                    <div
-                      className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-[#101014]/95"
-                      style={{ boxShadow: `0 0 26px ${location.accent}40` }}
-                    >
-                      <MapPin className="h-4 w-4" style={{ color: location.accent }} />
+            {/* Orbital rings */}
+            <div className="absolute inset-[12%] rounded-full border opacity-[0.15]" style={{ borderColor: 'var(--border-hover)' }} />
+            <div className="absolute inset-[20%] rounded-full border border-dashed opacity-[0.12]" style={{ borderColor: 'var(--border-hover)' }} />
+            <div className="absolute inset-[28%] rounded-full border opacity-[0.10]" style={{ borderColor: 'var(--border-hover)' }} />
+
+            {/* Glow center */}
+            <div
+              className="absolute inset-[18%] rounded-full blur-2xl"
+              style={{ background: 'radial-gradient(circle at center, rgba(17,115,188,0.15), transparent 55%)' }}
+            />
+
+            {/* Location Pins */}
+            <div className="absolute inset-0">
+              {globalPresenceLocations.map((location, index) => {
+                const isFuture = location.status === 'Future';
+                return (
+                  <motion.div
+                    key={location.name}
+                    className="absolute"
+                    style={pinPositions[index]}
+                    initial={{ scale: 0, opacity: 0 }}
+                    whileInView={{ scale: 1, opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.5 + index * 0.1, type: 'spring', stiffness: 200 }}
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <div
+                        className="relative flex h-12 w-12 items-center justify-center rounded-full border"
+                        style={{
+                          borderColor: isFuture ? `${location.accent}40` : `${location.accent}60`,
+                          backgroundColor: isFuture ? `${location.accent}12` : `${location.accent}20`,
+                          boxShadow: `0 0 30px ${location.accent}25`,
+                        }}
+                      >
+                        {!isFuture && (
+                          <span className="absolute -right-1 -top-1 flex h-3 w-3">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style={{ backgroundColor: location.accent }} />
+                            <span className="relative inline-flex h-3 w-3 rounded-full" style={{ backgroundColor: location.accent }} />
+                          </span>
+                        )}
+                        <MapPin className="h-5 w-5" style={{ color: location.accent }} />
+                      </div>
+                      <span
+                        className="rounded-full border px-3 py-1 text-[11px] font-mono uppercase tracking-[0.15em] backdrop-blur-sm"
+                        style={{
+                          borderColor: 'var(--border-default)',
+                          backgroundColor: 'var(--bg-glass-strong)',
+                          color: 'var(--text-primary)',
+                        }}
+                      >
+                        {location.name}
+                      </span>
                     </div>
-                    <span className="rounded-full border border-white/10 bg-[#0f0f13]/92 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.18em] text-white/68">
-                      {location.name}
-                    </span>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Bottom caption */}
+            <div className="absolute bottom-4 left-4 right-4">
+              <div
+                className="flex items-center justify-between rounded-2xl border px-4 py-3 backdrop-blur-xl"
+                style={{ borderColor: 'var(--border-default)', backgroundColor: 'var(--bg-glass-strong)' }}
+              >
+                <div className="flex items-center gap-2">
+                  <Radio className="h-4 w-4" style={{ color: 'var(--text-muted)' }} />
+                  <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>Global Network Active</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-2 w-2 rounded-full bg-emerald-400" />
+                    <span className="text-[10px] font-mono uppercase" style={{ color: 'var(--text-muted)' }}>Active</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-2 w-2 rounded-full" style={{ backgroundColor: 'var(--text-muted)' }} />
+                    <span className="text-[10px] font-mono uppercase" style={{ color: 'var(--text-muted)' }}>Future</span>
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
-          </GlassCard>
+          </motion.div>
 
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-2">
-            {globalPresenceLocations.map((location, index) => (
-              <motion.div
-                key={location.name}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.05 }}
-              >
-                <GlassCard className="h-full rounded-[28px] border-white/[0.09] bg-[#101014]/88 p-6 lg:p-7" glow="gradient">
+          {/* Location Cards */}
+          <div className="grid gap-4 content-start">
+            {globalPresenceLocations.map((location, index) => {
+              const isFuture = location.status === 'Future';
+              return (
+                <motion.div
+                  key={location.name}
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.08 }}
+                  className="group rounded-[20px] border p-5 transition-all duration-300 hover:scale-[1.01]"
+                  style={{
+                    backgroundColor: 'var(--bg-glass)',
+                    borderColor: 'var(--border-default)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = `${location.accent}40`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--border-default)';
+                  }}
+                >
                   <div className="flex items-center justify-between gap-3">
-                    <h3 className="font-display text-2xl font-bold text-white">{location.name}</h3>
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="flex h-9 w-9 items-center justify-center rounded-xl"
+                        style={{ backgroundColor: `${location.accent}12` }}
+                      >
+                        <MapPin className="h-4 w-4" style={{ color: location.accent }} />
+                      </div>
+                      <h3 className="font-display text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+                        {location.name}
+                      </h3>
+                    </div>
                     <span
-                      className="rounded-full border px-3 py-1 text-[11px] font-mono uppercase tracking-[0.18em]"
+                      className="rounded-full border px-3 py-1 text-[10px] font-mono uppercase tracking-wider"
                       style={{
-                        borderColor: `${location.accent}55`,
-                        color: location.accent,
-                        backgroundColor: `${location.accent}12`,
+                        borderColor: isFuture ? 'var(--border-default)' : `${location.accent}30`,
+                        backgroundColor: isFuture ? 'var(--chip-bg)' : `${location.accent}10`,
+                        color: isFuture ? 'var(--text-muted)' : location.accent,
                       }}
                     >
                       {location.status}
                     </span>
                   </div>
-
-                  <p className="mt-4 text-sm leading-7 text-white/72">{location.description}</p>
-                </GlassCard>
-              </motion.div>
-            ))}
+                  <p className="mt-3 text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                    {location.description}
+                  </p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </div>
