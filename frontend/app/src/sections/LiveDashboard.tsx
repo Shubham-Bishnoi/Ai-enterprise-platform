@@ -1,76 +1,187 @@
 import { motion } from 'framer-motion';
-import { Activity, Dot, ShieldCheck } from 'lucide-react';
-import { GlassCard, SectionHeader } from '@/components/shared';
+import { Activity, Dot, ShieldCheck, TrendingUp, Users, Cpu, Globe, Layers } from 'lucide-react';
 import { liveDashboardMetrics, liveDashboardPanels, siteContainerClass } from '@/lib/siteContent';
+
+const metricIcons = [Users, Cpu, Layers, Globe, TrendingUp];
+
+const activityFeed = [
+  { label: 'New blueprint request', time: '2m ago', type: 'request' },
+  { label: 'Agent deployment completed', time: '15m ago', type: 'deployment' },
+  { label: 'Governance check passed', time: '32m ago', type: 'governance' },
+  { label: 'Platform update rolled out', time: '1h ago', type: 'update' },
+];
 
 export default function LiveDashboard() {
   return (
-    <section id="live-dashboard" className="py-20 lg:py-24">
+    <section id="live-dashboard" className="relative py-20 lg:py-28 overflow-hidden">
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'radial-gradient(circle at 50% 50%, rgba(17,115,188,0.06), transparent 50%), radial-gradient(circle at 90% 10%, rgba(154,0,3,0.04), transparent 30%)',
+        }}
+      />
+
       <div className={siteContainerClass}>
-        <SectionHeader
-          eyebrow="Live Dashboard"
-          title="Live AI Transformation Dashboard"
-          subtitle="A command-center view of the GFF AI ecosystem."
-        />
+        {/* Header */}
+        <div className="text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-mono uppercase tracking-[0.24em]"
+            style={{ borderColor: 'var(--border-default)', backgroundColor: 'var(--chip-bg)', color: 'var(--text-secondary)' }}
+          >
+            <Activity className="h-3.5 w-3.5" />
+            Live Dashboard
+          </motion.div>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="font-display text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            Live AI Transformation <span className="text-gradient">Dashboard</span>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="mx-auto mt-4 max-w-2xl text-lg"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            A command-center view of the GFF AI ecosystem. Ecosystem snapshot for executive visibility.
+          </motion.p>
+        </div>
 
-        <div className="mt-12 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-          <GlassCard className="rounded-[32px] border-white/[0.1] bg-[#101014]/92 p-6 lg:p-8" glow="gradient">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+        {/* Dashboard Layout */}
+        <div className="mt-14 grid gap-6 xl:grid-cols-[1fr_0.35fr]">
+          {/* Main Dashboard Panel */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="overflow-hidden rounded-[28px] border"
+            style={{ backgroundColor: 'var(--bg-glass)', borderColor: 'var(--border-default)' }}
+          >
+            {/* Panel Header */}
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b p-6 lg:p-8" style={{ borderColor: 'var(--border-default)' }}>
               <div>
-                <div className="inline-flex items-center gap-1 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.22em] text-emerald-300">
-                  <Dot className="h-6 w-6 animate-pulse" />
-                  Ecosystem Snapshot
+                <div className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1" style={{ borderColor: 'var(--status-green-border)', backgroundColor: 'var(--status-green-bg)' }}>
+                  <Dot className="h-5 w-5 animate-pulse" style={{ color: 'var(--status-green-text)' }} />
+                  <span className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: 'var(--status-green-text)' }}>Ecosystem Snapshot</span>
                 </div>
-                <h3 className="mt-4 font-display text-3xl font-bold text-white">Command center overview</h3>
+                <h3 className="mt-3 font-display text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                  Command center overview
+                </h3>
               </div>
-              <div className="rounded-[24px] border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white/72">
-                Static visualization for Phase 2
+              <div
+                className="rounded-2xl border px-4 py-2.5 text-sm"
+                style={{ borderColor: 'var(--border-default)', backgroundColor: 'var(--chip-bg)', color: 'var(--text-muted)' }}
+              >
+                Example operating view
               </div>
             </div>
 
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-              {liveDashboardMetrics.map((metric, index) => (
-                <motion.div
-                  key={metric.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.45, delay: index * 0.04 }}
-                  className="rounded-[24px] border border-white/10 bg-[#0d0d10] p-4"
-                >
-                  <div className="text-3xl font-display font-bold text-white">{metric.value}</div>
-                  <div className="mt-2 text-sm text-white/62">{metric.label}</div>
-                </motion.div>
-              ))}
+            {/* Metrics Grid */}
+            <div className="grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-5 lg:p-8">
+              {liveDashboardMetrics.map((metric, index) => {
+                const Icon = metricIcons[index];
+                return (
+                  <motion.div
+                    key={metric.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.05 }}
+                    className="rounded-2xl border p-5 transition-all duration-300 hover:scale-[1.02]"
+                    style={{
+                      backgroundColor: 'var(--bg-elevated)',
+                      borderColor: 'var(--border-default)',
+                    }}
+                  >
+                    <Icon className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />
+                    <div className="mt-4 font-display text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                      {metric.value}
+                    </div>
+                    <div className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      {metric.label}
+                    </div>
+                    {/* Mini bar chart */}
+                    <div className="mt-3 flex items-end gap-1 h-6">
+                      {[40, 65, 45, 80, 55, 90, 70].map((h, i) => (
+                        <div
+                          key={i}
+                          className="flex-1 rounded-sm"
+                          style={{
+                            height: `${h}%`,
+                            backgroundColor: i === 5 ? 'var(--gff-blue)' : 'var(--border-hover)',
+                            opacity: 0.6 + (i * 0.06),
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
 
-            <div className="mt-6 rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01))] p-5">
-              <div className="flex items-center gap-3 text-sm text-white/72">
-                <Activity className="h-4 w-4 text-core-blue" />
+            {/* Bottom Panel - Status */}
+            <div className="mx-6 mb-6 rounded-2xl border p-5 lg:mx-8 lg:mb-8" style={{ borderColor: 'var(--border-default)', backgroundColor: 'var(--chip-bg)' }}>
+              <div className="flex items-center gap-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <Activity className="h-4 w-4 flex-shrink-0" style={{ color: 'var(--gff-blue)' }} />
                 Active programs, advisory sessions, and platform readiness signals are summarized here for a premium ecosystem view.
               </div>
             </div>
-          </GlassCard>
+          </motion.div>
 
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-1">
+          {/* Side Panels */}
+          <div className="space-y-6">
+            {/* Detail Panels */}
             {liveDashboardPanels.map((panel, index) => (
               <motion.div
                 key={panel.title}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.05 }}
+                transition={{ delay: index * 0.08 }}
+                className="rounded-2xl border p-5 transition-all duration-300 hover:scale-[1.01]"
+                style={{ backgroundColor: 'var(--bg-glass)', borderColor: 'var(--border-default)' }}
               >
-                <GlassCard className="rounded-[28px] border-white/[0.09] bg-[#101014]/88 p-6 lg:p-7" glow="gradient">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-sm font-medium text-white/80">{panel.title}</span>
-                    <ShieldCheck className="h-4 w-4 text-core-blue" />
-                  </div>
-                  <div className="mt-4 font-display text-4xl font-bold text-white">{panel.value}</div>
-                  <p className="mt-3 text-sm leading-7 text-white/66">{panel.detail}</p>
-                </GlassCard>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-medium" style={{ color: 'var(--text-tertiary)' }}>{panel.title}</span>
+                  <ShieldCheck className="h-4 w-4 flex-shrink-0" style={{ color: 'var(--gff-blue)' }} />
+                </div>
+                <div className="mt-3 font-display text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{panel.value}</div>
+                <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>{panel.detail}</p>
               </motion.div>
             ))}
+
+            {/* Activity Feed */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+              className="rounded-2xl border p-5"
+              style={{ backgroundColor: 'var(--bg-glass)', borderColor: 'var(--border-default)' }}
+            >
+              <h4 className="mb-4 text-sm font-medium" style={{ color: 'var(--text-tertiary)' }}>Recent Activity</h4>
+              <div className="space-y-3">
+                {activityFeed.map((item, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="relative flex h-2 w-2 flex-shrink-0">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60" style={{ backgroundColor: i === 0 ? '#10B981' : 'transparent' }} />
+                      <span className="relative inline-flex h-2 w-2 rounded-full" style={{ backgroundColor: i === 0 ? '#10B981' : 'var(--border-hover)' }} />
+                    </div>
+                    <span className="flex-1 text-sm truncate" style={{ color: 'var(--text-secondary)' }}>{item.label}</span>
+                    <span className="text-xs font-mono flex-shrink-0" style={{ color: 'var(--text-muted)' }}>{item.time}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
           </div>
         </div>
       </div>
