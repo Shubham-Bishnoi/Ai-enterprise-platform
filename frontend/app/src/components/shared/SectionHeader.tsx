@@ -32,20 +32,22 @@ export function SectionHeader({
       className={centered ? 'text-center' : ''}
     >
       {eyebrow && (
-        <div className="flex items-center gap-4 mb-4 justify-center">
-          <span className="h-px w-16 bg-white/20" />
-          <span className="text-sm font-mono text-muted-text tracking-wider uppercase">
+        <div className={`flex items-center gap-4 mb-4 ${centered ? 'justify-center' : ''}`}>
+          <span className="h-px w-16 bg-[var(--border-hover)]" />
+          <span className="text-sm font-mono tracking-wider uppercase" style={{ color: 'var(--text-secondary)' }}>
             {eyebrow}
           </span>
-          <span className="h-px w-16 bg-white/20" />
+          <span className="h-px w-16 bg-[var(--border-hover)]" />
         </div>
       )}
-      <h2 className={`font-display font-bold text-white leading-[1.05] ${sizeClasses[size]}`}>
+      <h2 className={`font-display font-bold leading-[1.05] ${sizeClasses[size]}`} style={{ color: 'var(--text-primary)' }}>
         {title}
         {highlight && <span className="text-gradient"> {highlight}</span>}
       </h2>
       {subtitle && (
-        <p className="mt-4 text-muted-text max-w-2xl mx-auto text-lg">{subtitle}</p>
+        <p className="mt-4 max-w-2xl text-lg" style={{ color: 'var(--text-secondary)' }}>
+          {subtitle}
+        </p>
       )}
     </motion.div>
   );

@@ -32,15 +32,16 @@ export function GlassCard({
   return (
     <div
       className={cn(
-        'rounded-2xl border border-white/[0.08] backdrop-blur-xl',
-        'bg-[rgba(26,26,26,0.55)]',
+        'rounded-2xl border backdrop-blur-xl transition-all duration-500',
         paddingClasses[padding],
-        hover && 'transition-all duration-500 hover:-translate-y-0.5',
+        hover && 'hover:-translate-y-0.5',
         hover && glowClasses[glow],
-        hover && 'hover:border-white/[0.14]',
+        hover && 'hover:border-[var(--border-hover)]',
         className
       )}
       style={{
+        background: 'var(--bg-glass)',
+        borderColor: 'var(--border-default)',
         WebkitBackdropFilter: 'blur(24px)',
       }}
     >
