@@ -9,7 +9,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const desktopNavItems = useMemo(
-    () => primaryNavItems.filter((item) => !item.mobileOnly),
+    () => primaryNavItems.filter((item) => !item.mobileOnly && item.label !== 'Contact'),
     []
   );
 
@@ -29,11 +29,10 @@ export default function Navbar() {
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
             ? 'bg-[#0D0D0D]/70 backdrop-blur-2xl border-b border-white/[0.06]'
             : 'bg-transparent'
-        }`}
+          }`}
         style={scrolled ? {
           WebkitBackdropFilter: 'blur(24px)',
           boxShadow: '0 4px 30px rgba(0,0,0,0.3), 0 0 40px rgba(17,115,188,0.04)',
@@ -86,8 +85,7 @@ export default function Navbar() {
                   to={link.to}
                   end={link.end}
                   className={({ isActive }) =>
-                    `group relative rounded-xl px-3 py-2 text-[13px] transition-colors duration-300 xl:px-4 xl:text-sm ${
-                      isActive ? 'text-white' : 'text-muted-text hover:text-white'
+                    `group relative rounded-xl px-3 py-2 text-[13px] transition-colors duration-300 xl:px-4 xl:text-sm ${isActive ? 'text-white' : 'text-muted-text hover:text-white'
                     }`
                   }
                 >
@@ -95,9 +93,8 @@ export default function Navbar() {
                     <>
                       {link.label}
                       <span
-                        className={`absolute bottom-0 left-1/2 h-0.5 -translate-x-1/2 rounded-full bg-gff-gradient transition-all duration-300 ${
-                          isActive ? 'w-1/2' : 'w-0 group-hover:w-1/2'
-                        }`}
+                        className={`absolute bottom-0 left-1/2 h-0.5 -translate-x-1/2 rounded-full bg-gff-gradient transition-all duration-300 ${isActive ? 'w-1/2' : 'w-0 group-hover:w-1/2'
+                          }`}
                       />
                     </>
                   )}
@@ -169,8 +166,7 @@ export default function Navbar() {
                     to={link.to}
                     end={link.end}
                     className={({ isActive }) =>
-                      `text-2xl font-display transition-colors ${
-                        isActive ? 'text-white' : 'text-white hover-text-gradient'
+                      `text-2xl font-display transition-colors ${isActive ? 'text-white' : 'text-white hover-text-gradient'
                       }`
                     }
                   >
