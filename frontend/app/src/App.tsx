@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Route, Routes, useLocation } from 'react-router';
+import { HashRouter, Route, Routes, useLocation } from 'react-router';
 import { PageShell } from '@/components/shared/PageShell';
 import Build from '@/pages/Build';
 import Capabilities from '@/pages/Capabilities';
@@ -57,7 +57,7 @@ function ScrollManager() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <ScrollManager />
       <PageShell>
         <Routes>
@@ -73,6 +73,6 @@ export default function App() {
           <Route path="/portal" element={<Portal />} />
         </Routes>
       </PageShell>
-    </BrowserRouter>
+    </HashRouter>
   );
 }

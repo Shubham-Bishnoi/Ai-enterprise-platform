@@ -107,6 +107,22 @@ module.exports = {
           "0%": { backgroundPosition: "0% 50%" },
           "100%": { backgroundPosition: "200% 50%" },
         },
+        "pulse-ring": {
+          "0%": { transform: "scale(0.8)", opacity: "0.8" },
+          "100%": { transform: "scale(2.2)", opacity: "0" },
+        },
+        "scan-line": {
+          "0%": { transform: "translateY(-100%)" },
+          "100%": { transform: "translateY(100%)" },
+        },
+        "type-cursor": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0" },
+        },
+        "grid-pulse": {
+          "0%, 100%": { opacity: "0.3" },
+          "50%": { opacity: "0.6" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -119,6 +135,10 @@ module.exports = {
         "slide-in-right": "slide-in-right 0.6s ease-out forwards",
         "scale-in": "scale-in 0.5s ease-out forwards",
         "border-flow": "border-flow 3s linear infinite",
+        "pulse-ring": "pulse-ring 1.5s ease-out infinite",
+        "scan-line": "scan-line 3s ease-in-out infinite",
+        "type-cursor": "type-cursor 1s step-end infinite",
+        "grid-pulse": "grid-pulse 4s ease-in-out infinite",
       },
     },
   },
