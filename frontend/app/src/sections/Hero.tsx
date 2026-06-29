@@ -24,7 +24,9 @@ export default function Hero() {
 
       <div className="relative z-10 flex flex-col pt-16 lg:pt-20">
         <div className="relative min-h-[560px] lg:min-h-[600px] xl:min-h-[630px]">
-          <div className="absolute inset-y-0 right-0 w-full overflow-hidden lg:w-[56%] xl:w-[54%]">
+          <div className="absolute inset-y-0 left-0 z-0 hidden w-[55%] bg-[var(--gff-hero-surface)] lg:block" />
+
+          <div className="absolute inset-y-0 right-0 w-full overflow-hidden lg:w-[62%] xl:w-[60%]">
             <video
               ref={videoRef}
               autoPlay
@@ -41,25 +43,33 @@ export default function Hero() {
               <source src="/assets/hero-video.mp4" type="video/mp4" />
             </video>
 
-            <div className="absolute inset-0 bg-gradient-to-r from-[var(--gff-media-scrim)] via-[var(--gff-media-scrim-mid)] to-transparent" />
             <div
-              className="absolute inset-0"
+              className="pointer-events-none absolute inset-0 z-10"
+              style={{
+                background:
+                  'linear-gradient(90deg, var(--gff-hero-surface) 0%, rgba(3, 3, 5, 0.96) 12%, rgba(3, 3, 5, 0.82) 26%, rgba(3, 3, 5, 0.52) 42%, rgba(3, 3, 5, 0.18) 60%, transparent 78%)',
+              }}
+            />
+            <div className="pointer-events-none absolute inset-y-0 left-[-80px] z-20 hidden w-[360px] bg-[var(--gff-hero-surface)]/80 blur-[60px] lg:block" />
+            <div
+              className="absolute inset-0 z-10"
               style={{
                 backgroundImage:
                   'radial-gradient(circle at 72% 45%, rgba(17,115,188,0.18), transparent 38%), radial-gradient(circle at 90% 28%, rgba(154,0,3,0.12), transparent 28%)',
               }}
             />
-            <div className="absolute inset-0 bg-[var(--gff-media-scrim-soft)]" />
+            <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-black/25 via-transparent to-black/45" />
+            <div className="absolute inset-0 z-10 bg-[var(--gff-media-scrim-soft)]" />
             <div
-              className="absolute inset-0"
+              className="absolute inset-0 z-10"
               style={{ background: 'linear-gradient(to top, var(--gff-hero-surface) 0%, transparent 58%, var(--gff-hero-surface-edge) 100%)' }}
             />
             <ParticleField />
           </div>
 
-          <div className="relative z-20 flex min-h-[560px] items-center lg:min-h-[600px] xl:min-h-[620px] 2xl:min-h-[650px]">
+          <div className="relative z-30 flex min-h-[560px] items-center lg:min-h-[600px] xl:min-h-[620px] 2xl:min-h-[650px]">
             <div className="mx-auto w-full max-w-[1740px] px-6 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
-              <div className="relative z-20 w-full min-w-0 max-w-[780px] overflow-visible">
+              <div className="relative z-30 w-full min-w-0 max-w-[780px] overflow-visible">
                 <motion.div
                   initial={{ opacity: 0, x: -30 }}
                   animate={loaded ? { opacity: 1, x: 0 } : {}}
