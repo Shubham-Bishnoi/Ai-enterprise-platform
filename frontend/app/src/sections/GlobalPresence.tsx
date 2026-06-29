@@ -1,15 +1,7 @@
 import { motion } from 'framer-motion';
-import { MapPin, Globe, Radio } from 'lucide-react';
+import { MapPin, Globe } from 'lucide-react';
 import { globalPresenceLocations, siteContainerClass } from '@/lib/siteContent';
-
-const pinPositions = [
-  { left: '67%', top: '34%' },   // Singapore
-  { left: '56%', top: '49%' },   // India
-  { left: '43%', top: '27%' },   // London
-  { left: '79%', top: '71%' },   // Australia
-  { left: '50%', top: '43%' },   // Middle East
-  { left: '18%', top: '33%' },   // USA
-];
+import { GlobalNetwork3D } from '@/components/global-network';
 
 export default function GlobalPresence() {
   return (
@@ -77,89 +69,8 @@ export default function GlobalPresence() {
                 background: 'radial-gradient(circle at center, rgba(17,115,188,0.12), transparent 38%), radial-gradient(circle at 30% 30%, rgba(192,60,133,0.10), transparent 24%)',
               }}
             />
-
-            {/* Grid overlay */}
-            <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: 'linear-gradient(var(--border-default) 1px, transparent 1px), linear-gradient(90deg, var(--border-default) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-
-            {/* Orbital rings */}
-            <div className="absolute inset-[12%] rounded-full border opacity-[0.15]" style={{ borderColor: 'var(--border-hover)' }} />
-            <div className="absolute inset-[20%] rounded-full border border-dashed opacity-[0.12]" style={{ borderColor: 'var(--border-hover)' }} />
-            <div className="absolute inset-[28%] rounded-full border opacity-[0.10]" style={{ borderColor: 'var(--border-hover)' }} />
-
-            {/* Glow center */}
-            <div
-              className="absolute inset-[18%] rounded-full blur-2xl"
-              style={{ background: 'radial-gradient(circle at center, rgba(17,115,188,0.15), transparent 55%)' }}
-            />
-
-            {/* Location Pins */}
             <div className="absolute inset-0">
-              {globalPresenceLocations.map((location, index) => {
-                const isFuture = location.status === 'Future';
-                return (
-                  <motion.div
-                    key={location.name}
-                    className="absolute"
-                    style={pinPositions[index]}
-                    initial={{ scale: 0, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.5 + index * 0.1, type: 'spring', stiffness: 200 }}
-                  >
-                    <div className="flex flex-col items-center gap-2">
-                      <div
-                        className="relative flex h-12 w-12 items-center justify-center rounded-full border"
-                        style={{
-                          borderColor: isFuture ? `${location.accent}40` : `${location.accent}60`,
-                          backgroundColor: isFuture ? `${location.accent}12` : `${location.accent}20`,
-                          boxShadow: `0 0 30px ${location.accent}25`,
-                        }}
-                      >
-                        {!isFuture && (
-                          <span className="absolute -right-1 -top-1 flex h-3 w-3">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style={{ backgroundColor: location.accent }} />
-                            <span className="relative inline-flex h-3 w-3 rounded-full" style={{ backgroundColor: location.accent }} />
-                          </span>
-                        )}
-                        <MapPin className="h-5 w-5" style={{ color: location.accent }} />
-                      </div>
-                      <span
-                        className="rounded-full border px-3 py-1 text-[11px] font-mono uppercase tracking-[0.15em] backdrop-blur-sm"
-                        style={{
-                          borderColor: 'var(--border-default)',
-                          backgroundColor: 'var(--bg-glass-strong)',
-                          color: 'var(--text-primary)',
-                        }}
-                      >
-                        {location.name}
-                      </span>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {/* Bottom caption */}
-            <div className="absolute bottom-4 left-4 right-4">
-              <div
-                className="flex items-center justify-between rounded-2xl border px-4 py-3 backdrop-blur-xl"
-                style={{ borderColor: 'var(--border-default)', backgroundColor: 'var(--bg-glass-strong)' }}
-              >
-                <div className="flex items-center gap-2">
-                  <Radio className="h-4 w-4" style={{ color: 'var(--text-muted)' }} />
-                  <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>Global Network Active</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1.5">
-                    <div className="h-2 w-2 rounded-full bg-emerald-400" />
-                    <span className="text-[10px] font-mono uppercase" style={{ color: 'var(--text-muted)' }}>Active</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="h-2 w-2 rounded-full" style={{ backgroundColor: 'var(--text-muted)' }} />
-                    <span className="text-[10px] font-mono uppercase" style={{ color: 'var(--text-muted)' }}>Future</span>
-                  </div>
-                </div>
-              </div>
+              <GlobalNetwork3D bare className="h-full w-full" />
             </div>
           </motion.div>
 

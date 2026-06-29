@@ -1,0 +1,73 @@
+.gff-network-active {
+  stroke-dasharray: 14 22;
+  animation: gffNetworkFlow 3.5s linear infinite;
+}
+
+.gff-network-future {
+  stroke-dasharray: 5 14;
+  animation: gffNetworkFlow 7s linear infinite;
+}
+
+@keyframes gffNetworkFlow {
+  to {
+    stroke-dashoffset: -144;
+  }
+}
+
+.gff-hub-pulse {
+  animation: gffHubPulse 2.8s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes gffHubPulse {
+  0%,
+  100% {
+    opacity: 0.25;
+    r: 14;
+  }
+  50% {
+    opacity: 0.7;
+    r: 22;
+  }
+}
+
+.gff-hub-pulse-slow {
+  animation: gffHubPulseSlow 3.6s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes gffHubPulseSlow {
+  0%,
+  100% {
+    opacity: 0.1;
+    r: 18;
+  }
+  50% {
+    opacity: 0.4;
+    r: 30;
+  }
+}
+
+.gff-map-scan {
+  animation: gffMapScan 10s ease-in-out infinite;
+}
+
+@keyframes gffMapScan {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gff-network-active,
+  .gff-network-future,
+  .gff-hub-pulse,
+  .gff-hub-pulse-slow,
+  .gff-map-scan {
+    animation: none !important;
+  }
+}
