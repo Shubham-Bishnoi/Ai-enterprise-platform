@@ -32,14 +32,14 @@ export default function BuildWithGFF() {
           className="text-center mb-12"
         >
           <div className="flex items-center justify-center gap-4 mb-4">
-            <span className="h-px w-16 bg-white/20" />
-            <span className="text-sm font-mono text-muted-text tracking-wider uppercase">Build With GFF</span>
-            <span className="h-px w-16 bg-white/20" />
+            <span className="h-px w-16 bg-[color:var(--border-default)]" />
+            <span className="text-sm font-mono text-[color:var(--text-secondary)] tracking-wider uppercase">Build With GFF</span>
+            <span className="h-px w-16 bg-[color:var(--border-default)]" />
           </div>
-          <h2 className="font-display font-bold text-white text-3xl md:text-5xl lg:text-6xl leading-tight">
+          <h2 className="font-display font-bold text-[color:var(--text-primary)] text-3xl md:text-5xl lg:text-6xl leading-tight">
             Your AI Transformation <span className="text-gradient">Command Center</span>
           </h2>
-          <p className="mt-4 text-muted-text max-w-2xl mx-auto">
+          <p className="mt-4 text-[color:var(--text-secondary)] max-w-2xl mx-auto">
             Three powerful entry points to start, plan, and accelerate your AI journey.
           </p>
         </motion.div>
@@ -69,11 +69,11 @@ function TalkToAgentCard({ onOpenAgent }: { onOpenAgent: () => void }) {
       transition={{ duration: 0.6 }}
       className="rounded-2xl p-6"
       style={{
-        background: 'rgba(26,26,26,0.55)',
+        background: 'var(--bg-card)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        boxShadow: '0 8px 40px rgba(0,0,0,0.2)',
+        border: '1px solid var(--border-default)',
+        boxShadow: '0 8px 40px var(--gff-shadow)',
       }}
     >
       <div className="flex items-center gap-3 mb-4">
@@ -81,18 +81,18 @@ function TalkToAgentCard({ onOpenAgent }: { onOpenAgent: () => void }) {
           <MessageSquare className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h3 className="text-lg font-display font-bold text-white">Talk to Agent</h3>
-          <p className="text-[11px] text-muted-text">AI-powered conversation</p>
+          <h3 className="text-lg font-display font-bold text-[color:var(--text-primary)]">Talk to Agent</h3>
+          <p className="text-[11px] text-[color:var(--text-secondary)]">AI-powered conversation</p>
         </div>
       </div>
 
       <div className="mb-4">
-        <label className="text-xs font-mono text-muted-text mb-2 block">Describe your challenge</label>
+        <label className="text-xs font-mono text-[color:var(--text-secondary)] mb-2 block">Describe your challenge</label>
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Describe your AI challenge or business problem..."
-          className="w-full h-24 bg-white/[0.04] border border-white/[0.08] rounded-xl p-3 text-sm text-white placeholder:text-muted-text/50 focus:border-core-blue/40 focus:outline-none resize-none transition-colors"
+          className="w-full h-24 bg-[var(--input-bg)] border border-[color:var(--input-border)] rounded-xl p-3 text-sm text-[color:var(--text-primary)] placeholder:text-[color:var(--text-muted)] focus:border-core-blue/40 focus:outline-none resize-none transition-colors"
         />
       </div>
 
@@ -111,7 +111,7 @@ function TalkToAgentCard({ onOpenAgent }: { onOpenAgent: () => void }) {
         {message.trim() ? 'Send & Start Chat' : 'Start Chat'}
       </button>
 
-      <p className="text-xs font-mono text-muted-text mb-3">Output:</p>
+      <p className="text-xs font-mono text-[color:var(--text-secondary)] mb-3">Output:</p>
       <div className="grid grid-cols-3 gap-3">
         {[
           { icon: FileText, label: 'Proposal', color: '#EF4444' },
@@ -120,10 +120,10 @@ function TalkToAgentCard({ onOpenAgent }: { onOpenAgent: () => void }) {
         ].map((item) => (
           <div
             key={item.label}
-            className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.10] transition-colors"
+            className="flex flex-col items-center gap-2 p-3 rounded-xl bg-[var(--bg-glass)] border border-[color:var(--border-subtle)] hover:border-[color:var(--border-default)] transition-colors"
           >
             <item.icon className="w-5 h-5" style={{ color: item.color }} />
-            <span className="text-xs text-muted-text">{item.label}</span>
+            <span className="text-xs text-[color:var(--text-secondary)]">{item.label}</span>
           </div>
         ))}
       </div>
@@ -132,7 +132,7 @@ function TalkToAgentCard({ onOpenAgent }: { onOpenAgent: () => void }) {
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          className="mt-4 p-3 rounded-xl bg-gff-gradient-soft border border-white/10 text-sm text-white"
+          className="mt-4 p-3 rounded-xl bg-gff-gradient-soft border border-[color:var(--border-default)] text-sm text-white"
         >
           Agent is analyzing your challenge... Expect a tailored proposal within minutes.
         </motion.div>
@@ -169,11 +169,11 @@ function GenerateBlueprintCard() {
         transition={{ duration: 0.6, delay: 0.15 }}
         className="rounded-2xl p-6"
         style={{
-          background: 'rgba(26,26,26,0.55)',
+          background: 'var(--bg-card)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 8px 40px rgba(0,0,0,0.2)',
+          border: '1px solid var(--border-default)',
+          boxShadow: '0 8px 40px var(--gff-shadow)',
         }}
       >
         <div className="flex items-center gap-3 mb-4">
@@ -181,25 +181,25 @@ function GenerateBlueprintCard() {
             <FileText className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-display font-bold text-white">Generate Blueprint</h3>
-            <p className="text-[11px] text-muted-text">AI transformation roadmap</p>
+            <h3 className="text-lg font-display font-bold text-[color:var(--text-primary)]">Generate Blueprint</h3>
+            <p className="text-[11px] text-[color:var(--text-secondary)]">AI transformation roadmap</p>
           </div>
         </div>
 
         <div className="mb-4">
-          <label className="text-xs font-mono text-muted-text mb-2 block">Quick Select Industry</label>
+          <label className="text-xs font-mono text-[color:var(--text-secondary)] mb-2 block">Quick Select Industry</label>
           <div className="relative">
             <select
               value={industry}
               onChange={(e) => setIndustry(e.target.value)}
-              className="w-full appearance-none bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white focus:border-core-blue/40 focus:outline-none cursor-pointer"
+              className="w-full appearance-none bg-[var(--input-bg)] border border-[color:var(--input-border)] rounded-xl px-4 py-3 text-sm text-[color:var(--text-primary)] focus:border-core-blue/40 focus:outline-none cursor-pointer"
             >
-              <option value="" className="bg-[#0D0D0D]">Select Industry</option>
+              <option value="" className="bg-[var(--bg-elevated)] text-[color:var(--text-primary)]">Select Industry</option>
               {industries.map((o) => (
-                <option key={o} value={o} className="bg-[#0D0D0D]">{o}</option>
+                <option key={o} value={o} className="bg-[var(--bg-elevated)] text-[color:var(--text-primary)]">{o}</option>
               ))}
             </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-text pointer-events-none" />
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--text-secondary)] pointer-events-none" />
           </div>
         </div>
 
@@ -211,7 +211,7 @@ function GenerateBlueprintCard() {
           Quick Generate
         </button>
 
-        <p className="text-xs font-mono text-muted-text mb-3">Output:</p>
+        <p className="text-xs font-mono text-[color:var(--text-secondary)] mb-3">Output:</p>
 
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[
@@ -221,27 +221,27 @@ function GenerateBlueprintCard() {
           ].map((item) => (
             <div
               key={item.label}
-              className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]"
+              className="flex flex-col items-center gap-2 p-3 rounded-xl bg-[var(--bg-glass)] border border-[color:var(--border-subtle)]"
             >
               <item.icon className="w-5 h-5" style={{ color: item.color }} />
-              <span className="text-xs text-muted-text">{item.label}</span>
+              <span className="text-xs text-[color:var(--text-secondary)]">{item.label}</span>
             </div>
           ))}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-[var(--bg-glass)] border border-[color:var(--border-subtle)]">
             <MessageSquare className="w-4 h-4 text-core-blue" />
             <div>
-              <span className="text-xs text-white block">Team</span>
-              <span className="text-[10px] text-muted-text">5-8 specialists</span>
+              <span className="text-xs text-[color:var(--text-primary)] block">Team</span>
+              <span className="text-[10px] text-[color:var(--text-secondary)]">5-8 specialists</span>
             </div>
           </div>
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-[var(--bg-glass)] border border-[color:var(--border-subtle)]">
             <Calculator className="w-4 h-4 text-ice-blue" />
             <div>
-              <span className="text-xs text-white block">Cost</span>
-              <span className="text-[10px] text-muted-text">Based on scope</span>
+              <span className="text-xs text-[color:var(--text-primary)] block">Cost</span>
+              <span className="text-[10px] text-[color:var(--text-secondary)]">Based on scope</span>
             </div>
           </div>
         </div>
@@ -263,11 +263,11 @@ function AIReadinessCard() {
       transition={{ duration: 0.6, delay: 0.3 }}
       className="rounded-2xl p-6"
       style={{
-        background: 'rgba(26,26,26,0.55)',
+        background: 'var(--bg-card)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        boxShadow: '0 8px 40px rgba(0,0,0,0.2)',
+        border: '1px solid var(--border-default)',
+        boxShadow: '0 8px 40px var(--gff-shadow)',
       }}
     >
       <div className="flex items-center gap-3 mb-4">
@@ -275,8 +275,8 @@ function AIReadinessCard() {
           <Gauge className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h3 className="text-lg font-display font-bold text-white">AI Readiness</h3>
-          <p className="text-[11px] text-muted-text">Enterprise assessment</p>
+          <h3 className="text-lg font-display font-bold text-[color:var(--text-primary)]">AI Readiness</h3>
+          <p className="text-[11px] text-[color:var(--text-secondary)]">Enterprise assessment</p>
         </div>
       </div>
 
@@ -284,7 +284,7 @@ function AIReadinessCard() {
       <div className="flex items-center justify-center mb-6">
         <div className="relative w-28 h-28">
           <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+            <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border-subtle)" strokeWidth="8" />
             <circle
               cx="50" cy="50" r="42" fill="none"
               stroke="url(#gaugeGrad)" strokeWidth="8"
@@ -301,7 +301,7 @@ function AIReadinessCard() {
             </defs>
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-3xl font-display font-bold text-white">{score}</span>
+            <span className="text-3xl font-display font-bold text-[color:var(--text-primary)]">{score}</span>
           </div>
         </div>
       </div>
@@ -310,21 +310,21 @@ function AIReadinessCard() {
       <div className="flex items-center justify-center gap-6 mb-6">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-core-blue" />
-          <span className="text-xs text-muted-text">Recommendations</span>
-          <span className="text-xs text-white font-mono">12</span>
+          <span className="text-xs text-[color:var(--text-secondary)]">Recommendations</span>
+          <span className="text-xs text-[color:var(--text-primary)] font-mono">12</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-[#EF4444]" />
-          <span className="text-xs text-muted-text">Investment</span>
-          <span className="text-xs text-white font-mono">$420K</span>
+          <span className="text-xs text-[color:var(--text-secondary)]">Investment</span>
+          <span className="text-xs text-[color:var(--text-primary)] font-mono">$420K</span>
         </div>
       </div>
 
       {/* PDF Download */}
-      <button className="w-full py-2.5 mb-4 rounded-2xl text-sm text-white border border-white/[0.10] bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/[0.18] transition-all flex items-center justify-center gap-2">
-        <FileText className="w-4 h-4 text-muted-text" />
+      <button className="w-full py-2.5 mb-4 rounded-2xl text-sm text-[color:var(--text-primary)] border border-[color:var(--border-default)] bg-[var(--chip-bg)] hover:border-[color:var(--border-hover)] transition-all flex items-center justify-center gap-2">
+        <FileText className="w-4 h-4 text-[color:var(--text-secondary)]" />
         Download Full Report (PDF)
-        <Download className="w-4 h-4 text-muted-text" />
+        <Download className="w-4 h-4 text-[color:var(--text-secondary)]" />
       </button>
 
       {/* Mini output cards */}
@@ -336,10 +336,10 @@ function AIReadinessCard() {
         ].map((item) => (
           <div
             key={item.label}
-            className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.10] transition-colors cursor-pointer"
+            className="flex flex-col items-center gap-2 p-3 rounded-xl bg-[var(--bg-glass)] border border-[color:var(--border-subtle)] hover:border-[color:var(--border-default)] transition-colors cursor-pointer"
           >
             <item.icon className="w-5 h-5" style={{ color: item.color }} />
-            <span className="text-[10px] text-muted-text text-center">{item.label}</span>
+            <span className="text-[10px] text-[color:var(--text-secondary)] text-center">{item.label}</span>
           </div>
         ))}
       </div>

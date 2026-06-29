@@ -55,22 +55,22 @@ export function ContentPageTemplate({ page }: ContentPageTemplateProps) {
             {page.cards.map((card) => (
               <GlassCard
                 key={card.title}
-                className="h-full rounded-[28px] border-white/[0.09] bg-[#101014]/88 p-6 lg:p-7"
+                className="h-full rounded-[28px] border-[color:var(--border-default)] bg-[var(--bg-card)] p-6 lg:p-7"
                 glow="gradient"
               >
                 <div id={slugify(card.title)} className="scroll-mt-28" />
-                <div className="mb-4 inline-flex rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-mono uppercase tracking-[0.22em] text-white/60">
+                <div className="mb-4 inline-flex rounded-full border border-[color:var(--border-subtle)] bg-[var(--chip-bg)] px-3 py-1 text-[11px] font-mono uppercase tracking-[0.22em] text-[color:var(--text-tertiary)]">
                   {card.title}
                 </div>
-                <h2 className="font-display text-2xl font-bold text-white">{card.title}</h2>
-                <p className="mt-3 text-sm leading-7 text-white/72">{card.description}</p>
+                <h2 className="font-display text-2xl font-bold text-[color:var(--text-primary)]">{card.title}</h2>
+                <p className="mt-3 text-sm leading-7 text-[color:var(--text-secondary)]">{card.description}</p>
 
                 {card.bullets && (
                   <div className="mt-5 flex flex-wrap gap-2">
                     {card.bullets.map((bullet) => (
                       <span
                         key={bullet}
-                        className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-white/70"
+                        className="rounded-full border border-[color:var(--border-subtle)] bg-[var(--chip-bg)] px-3 py-1 text-xs text-[color:var(--text-secondary)]"
                       >
                         {bullet}
                       </span>
@@ -91,7 +91,7 @@ export function ContentPageTemplate({ page }: ContentPageTemplateProps) {
           </div>
 
           {page.bottomNote && (
-            <div className="mt-10 rounded-[28px] border border-white/8 bg-white/[0.03] p-6 text-sm text-white/70 backdrop-blur-xl lg:p-8">
+            <div className="mt-10 rounded-[28px] border border-[color:var(--border-subtle)] bg-[var(--bg-glass)] p-6 text-sm text-[color:var(--text-secondary)] backdrop-blur-xl lg:p-8">
               {page.bottomNote}
             </div>
           )}

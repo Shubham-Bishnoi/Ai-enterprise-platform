@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation } from 'react-router';
 import {
   BrainCircuit, Wrench, Gavel, Settings2, FlaskConical, Network, ShieldCheck,
   ArrowRight, Layers, Rocket, Target, Cpu, BookOpen
@@ -93,8 +94,17 @@ const capabilities = [
 ];
 
 export default function Capabilities() {
+  const location = useLocation();
   const [activeCap, setActiveCap] = useState(0);
   const active = capabilities[activeCap];
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const requested = params.get('cap');
+    if (!requested) return;
+    const index = capabilities.findIndex((cap) => cap.id === requested);
+    if (index >= 0) setActiveCap(index);
+  }, [location.search]);
 
   return (
     <main className="overflow-x-hidden">

@@ -158,7 +158,7 @@ export default function BlueprintGenerator() {
     if (selector.key === 'email') {
       return (
         <div key={selector.key}>
-          <label className="mb-2 block text-sm font-medium text-white/80">
+          <label className="mb-2 block text-sm font-medium text-[color:var(--text-secondary)]">
             {selector.label} {selector.required && <span className="text-red-400">*</span>}
           </label>
           <input
@@ -167,10 +167,10 @@ export default function BlueprintGenerator() {
             onChange={(e) => setSingle('email', e.target.value)}
             placeholder="you@company.com"
             className={cn(
-              'blueprint-email-input h-12 w-full rounded-xl border bg-white/[0.04] px-4 text-sm text-white/90 placeholder:text-white/45 outline-none transition-all md:text-base',
+              'blueprint-email-input h-12 w-full rounded-xl border bg-[var(--input-bg)] px-4 text-sm text-[color:var(--text-primary)] placeholder:text-[color:var(--text-muted)] outline-none transition-all md:text-base',
               errors.email
                 ? 'border-red-500/40 focus:border-red-500/60 focus:ring-4 focus:ring-red-500/10'
-                : 'border-white/[0.10] hover:border-white/[0.18] focus:border-core-blue/60 focus:ring-4 focus:ring-core-blue/10'
+                : 'border-[color:var(--input-border)] hover:border-[color:var(--border-hover)] focus:border-core-blue/60 focus:ring-4 focus:ring-core-blue/10'
             )}
           />
           {errors.email && (
@@ -195,7 +195,7 @@ export default function BlueprintGenerator() {
         }}
         className={cn('relative', isOpen && 'z-[120]')}
       >
-        <label className="mb-2 block text-sm font-medium text-white/80">
+        <label className="mb-2 block text-sm font-medium text-[color:var(--text-secondary)]">
           {selector.label} {selector.required && <span className="text-red-400">*</span>}
         </label>
         <button
@@ -203,22 +203,22 @@ export default function BlueprintGenerator() {
           onClick={() => setActiveSelector(isOpen ? null : selector.key)}
           aria-expanded={isOpen}
           className={cn(
-            'flex h-12 w-full items-center justify-between rounded-xl border bg-white/[0.04] px-4 text-left transition-all duration-300',
+            'flex h-12 w-full items-center justify-between rounded-xl border bg-[var(--input-bg)] px-4 text-left transition-all duration-300',
             hasError
               ? 'border-red-500/35 bg-red-500/[0.04]'
-              : 'border-white/[0.10] hover:border-white/[0.20]',
-            isOpen && 'border-core-blue/60 bg-white/[0.06] ring-4 ring-core-blue/10'
+              : 'border-[color:var(--input-border)] hover:border-[color:var(--border-hover)]',
+            isOpen && 'border-core-blue/60 bg-[var(--chip-bg)] ring-4 ring-core-blue/10'
           )}
         >
           <span
             className={cn(
               'min-w-0 flex-1 truncate pr-4 text-sm md:text-base',
-              isFieldSelected(selector.key) ? 'text-white/95' : 'text-white/45'
+              isFieldSelected(selector.key) ? 'text-[color:var(--text-primary)]' : 'text-[color:var(--text-muted)]'
             )}
           >
             {getSelectedText(selector)}
           </span>
-          <ChevronDown className={cn('h-4 w-4 flex-shrink-0 text-white/50 transition-transform', isOpen && 'rotate-180')} />
+          <ChevronDown className={cn('h-4 w-4 flex-shrink-0 text-[color:var(--text-muted)] transition-transform', isOpen && 'rotate-180')} />
         </button>
         {hasError && (
           <span className="mt-2 flex items-center gap-1 text-xs text-red-400">
@@ -230,12 +230,12 @@ export default function BlueprintGenerator() {
           <motion.div
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
-            className="absolute left-0 right-0 top-[calc(100%+8px)] z-[130] max-h-64 overflow-y-auto rounded-2xl border border-white/12 bg-[#0d0d10] p-2 shadow-2xl shadow-black/70 backdrop-blur-xl"
+            className="absolute left-0 right-0 top-[calc(100%+8px)] z-[130] max-h-64 overflow-y-auto rounded-2xl border border-[color:var(--border-default)] bg-[var(--bg-elevated)] p-2 shadow-2xl backdrop-blur-xl"
             style={{
-              boxShadow: '0 28px 72px rgba(0,0,0,0.72), inset 0 1px 0 rgba(255,255,255,0.05)',
+              boxShadow: '0 28px 72px rgba(0,0,0,0.28), inset 0 1px 0 var(--border-subtle)',
             }}
           >
-            <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(10,10,12,0.08)_20%,rgba(0,0,0,0.24)_100%)]" />
+            <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,transparent_55%,rgba(15,23,42,0.05)_100%)]" />
             {selector.options.map((opt) => {
               const isSelected = selector.multi
                 ? (form[selector.key] as string[]).includes(opt)
@@ -253,9 +253,9 @@ export default function BlueprintGenerator() {
                     }
                   }}
                   className={cn(
-                    'relative z-10 w-full rounded-xl px-4 py-3 text-left text-sm text-white/85 transition-all hover:bg-white/10 hover:text-white',
+                    'relative z-10 w-full rounded-xl px-4 py-3 text-left text-sm text-[color:var(--text-primary)] transition-all hover:bg-[var(--chip-bg)]',
                     isSelected
-                      ? 'bg-white/10 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]'
+                      ? 'bg-[var(--chip-bg)] shadow-[inset_0_0_0_1px_var(--border-subtle)]'
                       : ''
                   )}
                 >
@@ -285,15 +285,15 @@ export default function BlueprintGenerator() {
           className="mx-auto mb-12 max-w-4xl text-center"
         >
           <div className="flex items-center justify-center gap-4 mb-4">
-            <span className="h-px w-16 bg-white/20" />
-            <span className="text-sm font-mono text-muted-text tracking-wider uppercase">Blueprint Generator</span>
-            <span className="h-px w-16 bg-white/20" />
+            <span className="h-px w-16 bg-[color:var(--border-default)]" />
+            <span className="text-sm font-mono text-[color:var(--text-secondary)] tracking-wider uppercase">Blueprint Generator</span>
+            <span className="h-px w-16 bg-[color:var(--border-default)]" />
           </div>
-          <h2 className="font-display font-bold tracking-tight text-white text-4xl md:text-5xl lg:text-[54px] xl:text-[60px] 2xl:text-[66px] leading-tight">
+          <h2 className="font-display font-bold tracking-tight text-[color:var(--text-primary)] text-4xl md:text-5xl lg:text-[54px] xl:text-[60px] 2xl:text-[66px] leading-tight">
             <span>Generate Your </span>
             <span className="text-gradient lg:whitespace-nowrap">Enterprise AI Blueprint</span>
           </h2>
-          <p className="mt-4 text-muted-text max-w-2xl mx-auto text-lg">
+          <p className="mt-4 text-[color:var(--text-secondary)] max-w-2xl mx-auto text-lg">
             Answer a few strategic questions. Our AI engine will design your operating model,
             architecture, agent ecosystem, and transformation roadmap.
           </p>
@@ -305,16 +305,16 @@ export default function BlueprintGenerator() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="mx-auto mt-12 w-full max-w-[1040px] overflow-visible rounded-[26px] border border-white/10 bg-[#101014]/90 p-6 shadow-2xl lg:p-8"
+          className="mx-auto mt-12 w-full max-w-[1040px] overflow-visible rounded-[26px] border border-[color:var(--border-default)] bg-[var(--bg-card)] p-6 shadow-2xl lg:p-8"
           style={{
-            background: 'linear-gradient(135deg, rgba(26,26,26,0.7) 0%, rgba(13,13,13,0.8) 100%)',
+            background: 'linear-gradient(135deg, var(--bg-glass-strong) 0%, var(--bg-card) 100%)',
             backdropFilter: 'blur(22px)',
             WebkitBackdropFilter: 'blur(22px)',
-            boxShadow: '0 0 0 1px rgba(255,255,255,0.04), 0 20px 64px rgba(0,0,0,0.38), 0 0 32px rgba(17,115,188,0.06)',
+            boxShadow: '0 0 0 1px var(--border-subtle), 0 20px 64px var(--gff-shadow), 0 0 32px rgb(var(--gff-blue-rgb) / 0.06)',
           }}
         >
           {/* Progress indicator */}
-          <div className="mb-8 w-full overflow-x-auto rounded-2xl border border-white/[0.10] bg-white/[0.03] px-4 py-4 lg:overflow-hidden lg:px-5">
+          <div className="mb-8 w-full overflow-x-auto rounded-2xl border border-[color:var(--border-default)] bg-[var(--chip-bg)] px-4 py-4 lg:overflow-hidden lg:px-5">
             <div className="grid min-w-[760px] grid-cols-[auto_minmax(14px,1fr)_auto_minmax(14px,1fr)_auto_minmax(14px,1fr)_auto_minmax(14px,1fr)_auto_minmax(14px,1fr)_auto] items-center gap-2 lg:min-w-0">
               {requiredSelectors.map((selector, i) => {
                 const isCompleted = isFieldSelected(selector.key);
@@ -330,13 +330,13 @@ export default function BlueprintGenerator() {
                           isCompleted
                             ? 'border-transparent bg-gff-gradient text-white shadow-[0_0_18px_rgba(17,115,188,0.18)]'
                             : isCurrent
-                              ? 'border-core-blue/40 bg-core-blue/15 text-white'
-                              : 'border-white/[0.14] bg-white/[0.04] text-white/70'
+                              ? 'border-core-blue/40 bg-core-blue/15 text-[color:var(--text-primary)]'
+                              : 'border-[color:var(--border-default)] bg-[var(--chip-bg)] text-[color:var(--text-tertiary)]'
                         )}
                       >
                         {i + 1}
                       </span>
-                      <span className={cn('whitespace-nowrap text-[11px] font-medium leading-none lg:text-xs xl:text-[13px]', isCompleted || isCurrent ? 'text-white/90' : 'text-white/65')}>
+                      <span className={cn('whitespace-nowrap text-[11px] font-medium leading-none lg:text-xs xl:text-[13px]', isCompleted || isCurrent ? 'text-[color:var(--text-primary)]' : 'text-[color:var(--text-tertiary)]')}>
                         {stepLabels[selector.key] || selector.label}
                       </span>
                     </div>
@@ -346,13 +346,13 @@ export default function BlueprintGenerator() {
                         <div
                           className={cn(
                             'absolute inset-x-0 top-0 h-px transition-colors duration-300',
-                            isConnectorActive ? 'bg-white/25' : 'bg-white/10'
+                            isConnectorActive ? 'bg-[color:var(--border-hover)]' : 'bg-[color:var(--border-subtle)]'
                           )}
                         />
                         <ChevronRight
                           className={cn(
                             'absolute -right-1 -top-1.5 h-3 w-3 transition-colors duration-300',
-                            isConnectorActive ? 'text-white/35' : 'text-white/15'
+                            isConnectorActive ? 'text-[color:var(--text-muted)]' : 'text-[color:var(--border-subtle)]'
                           )}
                         />
                       </div>
@@ -376,7 +376,7 @@ export default function BlueprintGenerator() {
           <button
             type="button"
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="mt-7 inline-flex items-center gap-2 text-sm font-medium text-white/65 transition-colors hover:text-white"
+            className="mt-7 inline-flex items-center gap-2 text-sm font-medium text-[color:var(--text-secondary)] transition-colors hover:text-[color:var(--text-primary)]"
           >
             <span>{showAdvanced ? 'Hide' : 'Show'} Advanced Options</span>
             <ChevronDown className={cn('h-4 w-4 transition-transform', showAdvanced && 'rotate-180')} />
@@ -405,7 +405,7 @@ export default function BlueprintGenerator() {
             <span>Generate My Enterprise AI Blueprint</span>
           </motion.button>
 
-          <p className="mt-4 text-center text-xs leading-relaxed text-white/45">
+          <p className="mt-4 text-center text-xs leading-relaxed text-[color:var(--text-muted)]">
             Your blueprint will include: AI Readiness Score · Top 5 Opportunities · 90-Day Roadmap · Architecture · Governance
           </p>
         </motion.div>

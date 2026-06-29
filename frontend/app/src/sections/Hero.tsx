@@ -15,9 +15,12 @@ export default function Hero() {
   }, []);
 
   return (
-    <section id="hero" className="relative w-full overflow-hidden bg-[#030305]">
+    <section id="hero" className="relative w-full overflow-hidden bg-[var(--gff-hero-surface)]">
       <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'url(/assets/noise-texture.png)', backgroundRepeat: 'repeat' }} />
-      <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#030305] via-[#030305]/75 to-transparent" />
+      <div
+        className="absolute inset-x-0 top-0 h-28"
+        style={{ background: 'linear-gradient(to bottom, var(--gff-hero-surface) 0%, var(--gff-hero-surface-75) 70%, transparent 100%)' }}
+      />
 
       <div className="relative z-10 flex flex-col pt-16 lg:pt-20">
         <div className="relative min-h-[560px] lg:min-h-[600px] xl:min-h-[630px]">
@@ -38,7 +41,7 @@ export default function Hero() {
               <source src="/assets/hero-video.mp4" type="video/mp4" />
             </video>
 
-            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[var(--gff-media-scrim)] via-[var(--gff-media-scrim-mid)] to-transparent" />
             <div
               className="absolute inset-0"
               style={{
@@ -46,8 +49,11 @@ export default function Hero() {
                   'radial-gradient(circle at 72% 45%, rgba(17,115,188,0.18), transparent 38%), radial-gradient(circle at 90% 28%, rgba(154,0,3,0.12), transparent 28%)',
               }}
             />
-            <div className="absolute inset-0 bg-black/20" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#030305] via-transparent to-[#030305]/18" />
+            <div className="absolute inset-0 bg-[var(--gff-media-scrim-soft)]" />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, var(--gff-hero-surface) 0%, transparent 58%, var(--gff-hero-surface-edge) 100%)' }}
+            />
             <ParticleField />
           </div>
 
@@ -142,7 +148,7 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 1.2 }}
           className="relative z-20 mt-8 px-6 pb-6 sm:px-8 lg:mt-10 lg:px-12 xl:px-14 2xl:px-16"
         >
-          <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 rounded-[28px] border border-white/8 bg-[#0b0b10]/92 px-5 py-6 backdrop-blur-xl sm:px-6 md:grid-cols-3 md:gap-5 md:px-8 lg:grid-cols-6 lg:gap-6 lg:px-10 lg:py-8">
+          <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 rounded-[28px] border border-[color:var(--gff-hero-panel-border)] bg-[var(--gff-hero-panel-bg)] px-5 py-6 backdrop-blur-xl sm:px-6 md:grid-cols-3 md:gap-5 md:px-8 lg:grid-cols-6 lg:gap-6 lg:px-10 lg:py-8">
             {[
               { value: '500+', label: 'AI Use Cases' },
               { value: '20+', label: 'Industries' },

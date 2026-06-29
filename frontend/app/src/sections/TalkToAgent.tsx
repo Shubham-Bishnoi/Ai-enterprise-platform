@@ -95,14 +95,14 @@ export default function TalkToAgent() {
           className="text-center mb-6"
         >
           <div className="flex items-center justify-center gap-4 mb-4">
-            <span className="h-px w-16 bg-white/20" />
-            <span className="text-sm font-mono text-muted-text tracking-wider uppercase">Talk to GFF AI</span>
-            <span className="h-px w-16 bg-white/20" />
+            <span className="h-px w-16 bg-[color:var(--border-default)]" />
+            <span className="text-sm font-mono text-[color:var(--text-secondary)] tracking-wider uppercase">Talk to GFF AI</span>
+            <span className="h-px w-16 bg-[color:var(--border-default)]" />
           </div>
-          <h2 className="font-display font-extrabold text-white leading-[1.05] tracking-[-0.02em] text-[32px] md:text-[48px] lg:text-[64px] mb-4">
+          <h2 className="font-display font-extrabold text-[color:var(--text-primary)] leading-[1.05] tracking-[-0.02em] text-[32px] md:text-[48px] lg:text-[64px] mb-4">
             TALK TO AN <span className="text-gradient">AI SPECIALIST</span>
           </h2>
-          <p className="text-white/75 text-[18px] max-w-[700px] mx-auto">
+          <p className="text-[color:var(--text-secondary)] text-[18px] max-w-[700px] mx-auto">
             Get instant insights, strategies and roadmaps from our AI-powered expert agents.
             Select an agent or start a free-form conversation.
           </p>
@@ -184,9 +184,9 @@ function AgentCard({
       onClick={onSelect}
       className="group relative rounded-3xl p-5 cursor-pointer overflow-hidden h-[400px] flex flex-col text-center min-w-0"
       style={{
-        backgroundColor: '#050505',
-        border: '1px solid rgba(255,255,255,0.10)',
-        boxShadow: `inset 0 0 0 1px rgba(${r},${g},${b},0.22), inset 0 0 0 2px rgba(255,255,255,0.04)`,
+        backgroundColor: 'var(--bg-card)',
+        border: '1px solid var(--border-default)',
+        boxShadow: `inset 0 0 0 1px rgba(${r},${g},${b},0.22), inset 0 0 0 2px var(--border-subtle)`,
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
       }}
@@ -237,11 +237,11 @@ function AgentCard({
       <h3 className="mt-4 text-sm font-display font-bold" style={{ color: agent.color }}>
         {agent.label || agent.name}
       </h3>
-      <p className="mt-2 text-xs text-muted-text leading-relaxed px-2">{agent.desc}</p>
+      <p className="mt-2 text-xs text-[color:var(--text-secondary)] leading-relaxed px-2">{agent.desc}</p>
 
       <div className="mt-auto pt-4">
         <div
-          className="flex items-center justify-center gap-1 text-xs font-medium text-white/70 group-hover:text-white transition-colors"
+          className="flex items-center justify-center gap-1 text-xs font-medium text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition-colors"
           style={{ textShadow: `0 0 18px rgba(${r},${g},${b},0.20)` }}
         >
           <MessageSquare className="w-3 h-3 mr-1" />

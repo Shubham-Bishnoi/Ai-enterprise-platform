@@ -129,14 +129,14 @@ export default function IndustrySolutions() {
           className="text-center mb-16"
         >
           <div className="flex items-center justify-center gap-4 mb-4">
-            <span className="h-px w-16 bg-white/20" />
-            <span className="text-sm font-mono text-muted-text tracking-wider uppercase">Industry Solutions</span>
-            <span className="h-px w-16 bg-white/20" />
+            <span className="h-px w-16 bg-[color:var(--border-default)]" />
+            <span className="text-sm font-mono text-[color:var(--text-secondary)] tracking-wider uppercase">Industry Solutions</span>
+            <span className="h-px w-16 bg-[color:var(--border-default)]" />
           </div>
-          <h2 className="font-display font-bold text-white text-3xl md:text-5xl lg:text-6xl leading-tight">
+          <h2 className="font-display font-bold text-[color:var(--text-primary)] text-3xl md:text-5xl lg:text-6xl leading-tight">
             Enterprise AI for <span className="text-gradient">Every Industry</span>
           </h2>
-          <p className="mt-4 text-muted-text max-w-2xl mx-auto text-lg">
+          <p className="mt-4 text-[color:var(--text-secondary)] max-w-2xl mx-auto text-lg">
             Industry-specific AI solutions designed to transform operations, unlock new revenue, and accelerate growth.
           </p>
         </motion.div>
@@ -161,13 +161,13 @@ export default function IndustrySolutions() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="rounded-2xl p-6"
           style={{
-            background: 'rgba(26,26,26,0.4)',
+            background: 'var(--bg-glass)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255,255,255,0.06)',
+            border: '1px solid var(--border-subtle)',
           }}
         >
-          <h3 className="text-sm font-mono text-muted-text tracking-wider uppercase mb-4 text-center">
+          <h3 className="text-sm font-mono text-[color:var(--text-secondary)] tracking-wider uppercase mb-4 text-center">
             Also Serving
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -205,9 +205,9 @@ function FeaturedIndustryCard({
       transition={{ duration: 0.7, delay: index * 0.1 }}
       className="group relative rounded-2xl overflow-hidden cursor-pointer"
       style={{
-        backgroundColor: '#0A0A0A',
+        backgroundColor: 'var(--bg-card)',
         border: `1px solid ${ind.color}20`,
-        boxShadow: `inset 0 0 0 1px rgba(255,255,255,0.04)`,
+        boxShadow: `inset 0 0 0 1px var(--border-subtle)`,
         transformStyle: 'preserve-3d',
         rotateX: rX,
         rotateY: rY,
@@ -265,10 +265,10 @@ function FeaturedIndustryCard({
             />
           </div>
           <div>
-            <h3 className="text-lg font-display font-bold text-white group-hover:text-gradient transition-all">
+          <h3 className="text-lg font-display font-bold text-[color:var(--text-primary)] group-hover:text-gradient transition-all">
               {ind.name}
             </h3>
-            <p className="text-xs text-muted-text">{ind.tagline}</p>
+          <p className="text-xs text-[color:var(--text-secondary)]">{ind.tagline}</p>
           </div>
         </div>
 
@@ -284,20 +284,20 @@ function FeaturedIndustryCard({
         {/* Solutions list */}
         <div className="space-y-1.5 mb-4">
           {ind.solutions.slice(0, 3).map((sol) => (
-            <div key={sol} className="flex items-center gap-2 text-xs text-white/60">
+            <div key={sol} className="flex items-center gap-2 text-xs text-[color:var(--text-tertiary)]">
               <ArrowRight className="w-3 h-3 flex-shrink-0" style={{ color: ind.color }} />
               {sol}
             </div>
           ))}
           {ind.solutions.length > 3 && (
-            <div className="text-[11px] text-muted-text pl-5">+{ind.solutions.length - 3} more solutions</div>
+            <div className="text-[11px] text-[color:var(--text-secondary)] pl-5">+{ind.solutions.length - 3} more solutions</div>
           )}
         </div>
 
         {/* Expand button */}
         <button
           onClick={(e) => { e.stopPropagation(); onExpand(); }}
-          className="flex items-center gap-1 text-xs font-medium text-white/60 hover:text-white transition-colors group/btn"
+          className="flex items-center gap-1 text-xs font-medium text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)] transition-colors group/btn"
         >
           <span>{isExpanded ? 'Show Less' : 'Explore Solutions'}</span>
           <ChevronRight className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-90' : 'group-hover/btn:translate-x-0.5'}`} />
@@ -313,9 +313,9 @@ function FeaturedIndustryCard({
               transition={{ duration: 0.3 }}
               className="overflow-hidden"
             >
-              <div className="pt-3 mt-3 border-t border-white/[0.06] space-y-1.5">
+              <div className="pt-3 mt-3 border-t border-[color:var(--border-subtle)] space-y-1.5">
                 {ind.solutions.slice(3).map((sol) => (
-                  <div key={sol} className="flex items-center gap-2 text-xs text-white/60">
+                  <div key={sol} className="flex items-center gap-2 text-xs text-[color:var(--text-tertiary)]">
                     <ArrowRight className="w-3 h-3 flex-shrink-0" style={{ color: ind.color }} />
                     {sol}
                   </div>
@@ -338,11 +338,11 @@ function CompactIndustryCard({ ind, index }: { ind: typeof industries[0]; index:
       transition={{ duration: 0.5, delay: index * 0.08 }}
       className="group flex flex-col items-center text-center p-4 rounded-xl cursor-pointer transition-all duration-300 hover:-translate-y-1"
       style={{
-        backgroundColor: 'rgba(255,255,255,0.02)',
-        border: '1px solid rgba(255,255,255,0.05)',
+        backgroundColor: 'var(--chip-bg)',
+        border: '1px solid var(--border-subtle)',
       }}
       whileHover={{
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        backgroundColor: 'var(--bg-glass)',
         borderColor: `${ind.color}40`,
         boxShadow: `0 8px 24px ${ind.color}15`,
       }}
@@ -359,7 +359,7 @@ function CompactIndustryCard({ ind, index }: { ind: typeof industries[0]; index:
           style={{ filter: `drop-shadow(0 0 8px ${ind.color}25)` }}
         />
       </div>
-      <span className="text-xs font-medium text-white/80 group-hover:text-white transition-colors">
+      <span className="text-xs font-medium text-[color:var(--text-primary)] transition-colors">
         {ind.name}
       </span>
     </motion.div>

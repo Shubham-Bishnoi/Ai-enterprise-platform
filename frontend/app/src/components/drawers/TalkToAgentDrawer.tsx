@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router';
 import {
   X,
   Send,
@@ -22,11 +23,45 @@ interface TalkToAgentDrawerProps {
 }
 
 export function TalkToAgentDrawer({ isOpen, onClose }: TalkToAgentDrawerProps) {
+  const navigate = useNavigate();
   const [session, setSession] = useState<TalkToAgentSession | null>(null);
   const [input, setInput] = useState('');
   const [state, setState] = useState<TalkToAgentState>('welcome');
   const [recommendation, setRecommendation] = useState<ReturnType<typeof generateMockRecommendation> | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const handleNavigate = (href?: string) => {
+    if (!href) return;
+
+    if (href.startsWith('#')) {
+      const targetId = href.slice(1);
+      const element = document.getElementById(targetId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+
+      if (targetId === 'contact') {
+        navigate('/contact');
+        return;
+      }
+
+      if (targetId === 'ai-labs') {
+        navigate('/capabilities?cap=ai-labs');
+        return;
+      }
+
+      navigate({ pathname: '/', hash: href });
+      return;
+    }
+
+    if (href.startsWith('/')) {
+      navigate(href);
+      return;
+    }
+
+    window.open(href, '_blank', 'noopener,noreferrer');
+  };
 
   // Initialize session when drawer opens
   useEffect(() => {
@@ -126,9 +161,9 @@ Here are your personalized next steps:`;
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 280 }}
             style={{
-              background: 'linear-gradient(180deg, rgba(20,20,22,0.98) 0%, rgba(13,13,13,0.98) 100%)',
-              borderLeft: '1px solid rgba(255,255,255,0.08)',
-              boxShadow: '-20px 0 60px rgba(0,0,0,0.5), -4px 0 40px rgba(17,115,188,0.08)',
+              background: 'linear-gradient(180deg, var(--bg-glass-strong) 0%, var(--bg-card) 100%)',
+              borderLeft: '1px solid var(--border-default)',
+              boxShadow: `-20px 0 60px var(--gff-shadow), -4px 0 40px rgb(var(--gff-blue-rgb) / 0.08)`,
             }}
           >
             {/* Top gradient accent */}
@@ -140,26 +175,26 @@ Here are your personalized next steps:`;
             />
 
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[color:var(--border-subtle)]">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-gff-gradient flex items-center justify-center">
                   <Bot className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-display font-bold text-white">Talk to GFF AI</h3>
-                  <span className="text-[10px] text-muted-text">AI Enterprise Advisor</span>
+                  <h3 className="text-sm font-display font-bold text-[color:var(--text-primary)]">Talk to GFF AI</h3>
+                  <span className="text-[10px] text-[color:var(--text-secondary)]">AI Enterprise Advisor</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={resetSession}
-                  className="text-[10px] text-muted-text hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-white/[0.06]"
+                  className="text-[10px] text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)] transition-colors px-2 py-1 rounded-lg hover:bg-[var(--chip-bg)]"
                 >
                   New Chat
                 </button>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/[0.06] text-white/60 hover:text-white hover:bg-white/[0.12] transition-all"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--chip-bg)] text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)] transition-all border border-[color:var(--border-subtle)]"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -189,13 +224,13 @@ Here are your personalized next steps:`;
                       'max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed',
                       msg.role === 'user'
                         ? 'bg-gff-gradient text-white rounded-br-md'
-                        : 'bg-white/[0.05] text-white/90 border border-white/[0.06] rounded-bl-md'
+                        : 'bg-[var(--bg-glass)] text-[color:var(--text-primary)] border border-[color:var(--border-subtle)] rounded-bl-md'
                     )}
                   >
                     {msg.role === 'agent' ? (
                       <div dangerouslySetInnerHTML={{
                         __html: msg.text
-                          .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
+                          .replace(/\*\*(.*?)\*\*/g, '<strong class="text-[color:var(--text-primary)]">$1</strong>')
                           .replace(/\n/g, '<br/>')
                       }} />
                     ) : (
@@ -203,8 +238,8 @@ Here are your personalized next steps:`;
                     )}
                   </div>
                   {msg.role === 'user' && (
-                    <div className="w-7 h-7 rounded-lg bg-white/[0.08] flex items-center justify-center flex-shrink-0 mt-1">
-                      <User className="w-3.5 h-3.5 text-white/70" />
+                    <div className="w-7 h-7 rounded-lg bg-[var(--chip-bg)] border border-[color:var(--border-subtle)] flex items-center justify-center flex-shrink-0 mt-1">
+                      <User className="w-3.5 h-3.5 text-[color:var(--text-secondary)]" />
                     </div>
                   )}
                 </motion.div>
@@ -220,9 +255,9 @@ Here are your personalized next steps:`;
                   <div className="w-7 h-7 rounded-lg bg-gff-gradient flex items-center justify-center flex-shrink-0">
                     <Loader2 className="w-3.5 h-3.5 text-white animate-spin" />
                   </div>
-                  <div className="px-4 py-3 rounded-2xl bg-white/[0.05] border border-white/[0.06] rounded-bl-md">
+                  <div className="px-4 py-3 rounded-2xl bg-[var(--bg-glass)] border border-[color:var(--border-subtle)] rounded-bl-md">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-text">Analyzing your requirements...</span>
+                      <span className="text-xs text-[color:var(--text-secondary)]">Analyzing your requirements...</span>
                     </div>
                   </div>
                 </motion.div>
@@ -236,13 +271,13 @@ Here are your personalized next steps:`;
                   className="space-y-3"
                 >
                   {/* Detected Industry */}
-                  <div className="p-3 rounded-xl bg-white/[0.04] border border-white/[0.08]">
+                  <div className="p-3 rounded-xl bg-[var(--bg-glass)] border border-[color:var(--border-subtle)]">
                     <div className="flex items-center gap-2 mb-1">
                       <Target className="w-3.5 h-3.5 text-core-blue" />
-                      <span className="text-[10px] text-muted-text uppercase tracking-wider">Detected Industry</span>
+                      <span className="text-[10px] text-[color:var(--text-tertiary)] uppercase tracking-wider">Detected Industry</span>
                     </div>
-                    <span className="text-sm font-medium text-white">{recommendation.detectedIndustry.name}</span>
-                    <div className="mt-1 w-full h-1 rounded-full bg-white/[0.06] overflow-hidden">
+                    <span className="text-sm font-medium text-[color:var(--text-primary)]">{recommendation.detectedIndustry.name}</span>
+                    <div className="mt-1 w-full h-1 rounded-full bg-[var(--border-subtle)] overflow-hidden">
                       <div
                         className="h-full rounded-full bg-gff-gradient"
                         style={{ width: `${recommendation.detectedIndustry.confidence * 100}%` }}
@@ -252,17 +287,17 @@ Here are your personalized next steps:`;
 
                   {/* Recommended Paths */}
                   <div>
-                    <span className="text-[10px] text-muted-text uppercase tracking-wider block mb-2">Recommended Paths</span>
+                    <span className="text-[10px] text-[color:var(--text-tertiary)] uppercase tracking-wider block mb-2">Recommended Paths</span>
                     <div className="space-y-2">
                       {recommendation.recommendedPaths.map((path, _pi) => (
                         <div
                           key={path.id}
-                          className="flex items-center gap-2 p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06]"
+                          className="flex items-center gap-2 p-2.5 rounded-xl bg-[var(--bg-glass)] border border-[color:var(--border-subtle)]"
                         >
                           <Lightbulb className="w-4 h-4 text-core-blue flex-shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <span className="text-xs font-medium text-white block">{path.title}</span>
-                            <span className="text-[10px] text-muted-text">{path.description}</span>
+                            <span className="text-xs font-medium text-[color:var(--text-primary)] block">{path.title}</span>
+                            <span className="text-[10px] text-[color:var(--text-secondary)]">{path.description}</span>
                           </div>
                         </div>
                       ))}
@@ -271,17 +306,17 @@ Here are your personalized next steps:`;
 
                   {/* Relevant Solutions */}
                   <div>
-                    <span className="text-[10px] text-muted-text uppercase tracking-wider block mb-2">Relevant Solutions</span>
+                    <span className="text-[10px] text-[color:var(--text-tertiary)] uppercase tracking-wider block mb-2">Relevant Solutions</span>
                     <div className="space-y-2">
                       {recommendation.relevantSolutions.map((sol) => (
                         <div
                           key={sol.id}
-                          className="flex items-center gap-2 p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06]"
+                          className="flex items-center gap-2 p-2.5 rounded-xl bg-[var(--bg-glass)] border border-[color:var(--border-subtle)]"
                         >
                           <Sparkles className="w-4 h-4 text-core-blue flex-shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <span className="text-xs font-medium text-white block">{sol.name}</span>
-                            <span className="text-[10px] text-muted-text">{sol.description}</span>
+                            <span className="text-xs font-medium text-[color:var(--text-primary)] block">{sol.name}</span>
+                            <span className="text-[10px] text-[color:var(--text-secondary)]">{sol.description}</span>
                           </div>
                         </div>
                       ))}
@@ -290,15 +325,15 @@ Here are your personalized next steps:`;
 
                   {/* Relevant Labs */}
                   <div>
-                    <span className="text-[10px] text-muted-text uppercase tracking-wider block mb-2">Explore AI Labs</span>
+                    <span className="text-[10px] text-[color:var(--text-tertiary)] uppercase tracking-wider block mb-2">Explore AI Labs</span>
                     <div className="flex gap-2">
                       {recommendation.relevantLabs.map((lab) => (
                         <div
                           key={lab.id}
-                          className="flex-1 p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-center"
+                          className="flex-1 p-2.5 rounded-xl bg-[var(--bg-glass)] border border-[color:var(--border-subtle)] text-center"
                         >
                           <FlaskConical className="w-4 h-4 text-core-blue mx-auto mb-1" />
-                          <span className="text-[10px] text-white block">{lab.name}</span>
+                          <span className="text-[10px] text-[color:var(--text-primary)] block">{lab.name}</span>
                         </div>
                       ))}
                     </div>
@@ -306,7 +341,7 @@ Here are your personalized next steps:`;
 
                   {/* Next Actions */}
                   <div>
-                    <span className="text-[10px] text-muted-text uppercase tracking-wider block mb-2">Next Steps</span>
+                    <span className="text-[10px] text-[color:var(--text-tertiary)] uppercase tracking-wider block mb-2">Next Steps</span>
                     <div className="space-y-2">
                       {recommendation.nextStepActions.map((action, i) => (
                         <button
@@ -314,7 +349,7 @@ Here are your personalized next steps:`;
                           onClick={() => {
                             onClose();
                             setTimeout(() => {
-                              document.querySelector(action.href)?.scrollIntoView({ behavior: 'smooth' });
+                              handleNavigate(action.href);
                             }, 300);
                           }}
                           className="w-full flex items-center justify-between p-3 rounded-xl bg-gff-gradient text-white hover:shadow-[0_0_20px_rgba(17,115,188,0.3)] transition-all"
@@ -336,13 +371,13 @@ Here are your personalized next steps:`;
             {/* Quick Actions (Welcome State) */}
             {state === 'welcome' && (
               <div className="px-5 pb-3">
-                <span className="text-[10px] text-muted-text uppercase tracking-wider block mb-2">Quick Actions</span>
+                <span className="text-[10px] text-[color:var(--text-tertiary)] uppercase tracking-wider block mb-2">Quick Actions</span>
                 <div className="flex flex-wrap gap-1.5">
                   {quickActionChips.map((chip) => (
                     <button
                       key={chip.id}
                       onClick={() => handleQuickAction(chip.prompt)}
-                      className="px-3 py-1.5 rounded-full text-[11px] bg-white/[0.05] border border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.10] hover:border-white/[0.15] transition-all duration-300"
+                      className="px-3 py-1.5 rounded-full text-[11px] bg-[var(--chip-bg)] border border-[color:var(--border-default)] text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)] hover:border-[color:var(--border-hover)] transition-all duration-300"
                     >
                       {chip.label}
                     </button>
@@ -352,7 +387,7 @@ Here are your personalized next steps:`;
             )}
 
             {/* Input Area */}
-            <div className="px-5 py-4 border-t border-white/[0.06]">
+            <div className="px-5 py-4 border-t border-[color:var(--border-subtle)]">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -360,7 +395,7 @@ Here are your personalized next steps:`;
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                   placeholder={state === 'welcome' ? "Describe your challenge or ask anything..." : "Continue the conversation..."}
-                  className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-muted-text/50 focus:border-core-blue/40 focus:outline-none transition-colors"
+                  className="flex-1 bg-[var(--input-bg)] border border-[color:var(--input-border)] rounded-xl px-4 py-2.5 text-sm text-[color:var(--text-primary)] placeholder:text-[color:var(--text-muted)] focus:border-core-blue/40 focus:outline-none transition-colors"
                 />
                 <button
                   onClick={handleSend}

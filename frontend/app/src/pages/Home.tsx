@@ -20,7 +20,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-void text-white overflow-x-hidden">
+    <main className="min-h-screen bg-[var(--gff-bg)] text-[color:var(--gff-text)] overflow-x-hidden">
       <Hero />
       <TalkToAgent />
       <BlueprintGenerator />

@@ -59,11 +59,11 @@ export default function AIFoundryProcess() {
           className="text-center mb-10"
         >
           <div className="flex items-center justify-center gap-6">
-            <span className="h-px w-24 bg-white/20" />
-            <h2 className="text-white font-bold tracking-[0.05em] text-lg sm:text-xl">
+            <span className="h-px w-24 bg-[color:var(--border-default)]" />
+            <h2 className="text-[color:var(--text-primary)] font-bold tracking-[0.05em] text-lg sm:text-xl">
               THE <span className="text-gradient">AI FOUNDRY</span> PROCESS
             </h2>
-            <span className="h-px w-24 bg-white/20" />
+            <span className="h-px w-24 bg-[color:var(--border-default)]" />
           </div>
         </motion.div>
 
@@ -77,9 +77,9 @@ export default function AIFoundryProcess() {
               transition={{ duration: 0.7, delay: i * 0.15 }}
               className="group relative rounded-3xl p-5 cursor-default overflow-hidden h-[460px] flex flex-col min-w-0"
               style={{
-                backgroundColor: '#050505',
+                backgroundColor: 'var(--bg-card)',
                 border: `1px solid ${step.border}`,
-                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.08)',
+                boxShadow: 'inset 0 0 0 1px var(--border-subtle)',
               }}
               whileHover={{
                 y: -8,
@@ -124,10 +124,10 @@ export default function AIFoundryProcess() {
               </div>
 
               {/* Number */}
-              <span className="mt-3 text-xs font-mono text-white/60 mb-2 block">{step.num}</span>
+              <span className="mt-3 text-xs font-mono text-[color:var(--text-tertiary)] mb-2 block">{step.num}</span>
 
               {/* Title */}
-              <h3 className="text-lg font-display font-bold text-white/85 mb-2 transition-colors group-hover:text-white">
+              <h3 className="text-lg font-display font-bold text-[color:var(--text-primary)] mb-2 transition-colors">
                 {step.subtitle}
               </h3>
 
@@ -137,7 +137,7 @@ export default function AIFoundryProcess() {
               </span>
 
               {/* Description */}
-              <p className="text-sm text-muted-text leading-relaxed">{step.desc}</p>
+              <p className="text-sm text-[color:var(--text-secondary)] leading-relaxed">{step.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -147,7 +147,7 @@ export default function AIFoundryProcess() {
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ duration: 0.8, delay: 1 }}
-          className="text-center mt-10 text-lg text-white"
+          className="text-center mt-10 text-lg text-[color:var(--text-primary)]"
         >
           BUILT IN OUR <span className="text-[#FF3040] font-medium">GARAGE</span>. FORGED IN OUR{' '}
           <span className="text-[#FF9F1A] font-medium">FOUNDRY</span>. DEPLOYED IN YOUR{' '}

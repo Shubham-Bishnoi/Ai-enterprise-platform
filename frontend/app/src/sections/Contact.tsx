@@ -123,7 +123,7 @@ export default function Contact() {
               <h2 className="text-3xl lg:text-4xl font-display font-bold text-white">
                 Global <span className="text-gradient">Reach</span>
               </h2>
-              <p className="text-sm text-muted-text mt-2">Singapore — UK — India</p>
+              <p className="text-sm text-[color:rgba(255,255,255,0.78)] mt-2">Singapore — UK — India</p>
             </div>
 
             {/* Stats overlay */}
@@ -134,8 +134,8 @@ export default function Contact() {
                 { label: 'Experts', value: '200+' },
               ].map((stat) => (
                 <div key={stat.label} className="flex-1 glass-card rounded-lg p-3 text-center">
-                  <span className="text-lg font-display font-bold text-white block">{stat.value}</span>
-                  <span className="text-[10px] text-muted-text uppercase">{stat.label}</span>
+                  <span className="text-lg font-display font-bold text-[color:var(--text-primary)] block">{stat.value}</span>
+                  <span className="text-[10px] text-[color:var(--text-secondary)] uppercase">{stat.label}</span>
                 </div>
               ))}
             </div>
@@ -151,81 +151,81 @@ export default function Contact() {
           >
             {!submitted ? (
               <form onSubmit={handleSubmit} className="glass-card rounded-2xl p-8">
-                <h3 className="text-xl font-display font-bold text-white mb-6">Get in Touch</h3>
+                <h3 className="text-xl font-display font-bold text-[color:var(--text-primary)] mb-6">Get in Touch</h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="text-xs text-muted-text mb-1.5 block">Full Name</label>
+                    <label className="text-xs text-[color:var(--text-secondary)] mb-1.5 block">Full Name</label>
                     <input
                       type="text"
                       required
                       value={form.name}
                       onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
                       placeholder="Enter"
-                      className="w-full bg-[#0D0D0D] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder:text-muted-text/40 focus:border-core-blue/50 focus:outline-none transition-colors"
+                      className="w-full bg-[var(--input-bg)] border border-[color:var(--input-border)] rounded-lg px-4 py-3 text-sm text-[color:var(--text-primary)] placeholder:text-[color:var(--text-muted)] focus:border-core-blue/50 focus:outline-none transition-colors"
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-muted-text mb-1.5 block">Company / Organization</label>
+                    <label className="text-xs text-[color:var(--text-secondary)] mb-1.5 block">Company / Organization</label>
                     <input
                       type="text"
                       required
                       value={form.company}
                       onChange={(e) => setForm((p) => ({ ...p, company: e.target.value }))}
                       placeholder="Enter"
-                      className="w-full bg-[#0D0D0D] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder:text-muted-text/40 focus:border-core-blue/50 focus:outline-none transition-colors"
+                      className="w-full bg-[var(--input-bg)] border border-[color:var(--input-border)] rounded-lg px-4 py-3 text-sm text-[color:var(--text-primary)] placeholder:text-[color:var(--text-muted)] focus:border-core-blue/50 focus:outline-none transition-colors"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="text-xs text-muted-text mb-1.5 block">Business Email</label>
+                    <label className="text-xs text-[color:var(--text-secondary)] mb-1.5 block">Business Email</label>
                     <input
                       type="email"
                       required
                       value={form.email}
                       onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
                       placeholder="Enter"
-                      className="w-full bg-[#0D0D0D] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder:text-muted-text/40 focus:border-core-blue/50 focus:outline-none transition-colors"
+                      className="w-full bg-[var(--input-bg)] border border-[color:var(--input-border)] rounded-lg px-4 py-3 text-sm text-[color:var(--text-primary)] placeholder:text-[color:var(--text-muted)] focus:border-core-blue/50 focus:outline-none transition-colors"
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-muted-text mb-1.5 block">Phone Number</label>
+                    <label className="text-xs text-[color:var(--text-secondary)] mb-1.5 block">Phone Number</label>
                     <input
                       type="tel"
                       value={form.phone}
                       onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
                       placeholder="Enter"
-                      className="w-full bg-[#0D0D0D] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder:text-muted-text/40 focus:border-core-blue/50 focus:outline-none transition-colors"
+                      className="w-full bg-[var(--input-bg)] border border-[color:var(--input-border)] rounded-lg px-4 py-3 text-sm text-[color:var(--text-primary)] placeholder:text-[color:var(--text-muted)] focus:border-core-blue/50 focus:outline-none transition-colors"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                   <div>
-                    <label className="text-xs text-muted-text mb-1.5 block">Country / Region</label>
+                    <label className="text-xs text-[color:var(--text-secondary)] mb-1.5 block">Country / Region</label>
                     <input
                       type="text"
                       value={form.country}
                       onChange={(e) => setForm((p) => ({ ...p, country: e.target.value }))}
                       placeholder="Enter"
-                      className="w-full bg-[#0D0D0D] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder:text-muted-text/40 focus:border-core-blue/50 focus:outline-none transition-colors"
+                      className="w-full bg-[var(--input-bg)] border border-[color:var(--input-border)] rounded-lg px-4 py-3 text-sm text-[color:var(--text-primary)] placeholder:text-[color:var(--text-muted)] focus:border-core-blue/50 focus:outline-none transition-colors"
                     />
                   </div>
                   <div className="relative">
-                    <label className="text-xs text-muted-text mb-1.5 block">Service Interest</label>
+                    <label className="text-xs text-[color:var(--text-secondary)] mb-1.5 block">Service Interest</label>
                     <select
                       value={form.service}
                       onChange={(e) => setForm((p) => ({ ...p, service: e.target.value }))}
-                      className="w-full appearance-none bg-[#0D0D0D] border border-white/10 rounded-lg px-4 py-3 text-sm text-white focus:border-core-blue/50 focus:outline-none cursor-pointer"
+                      className="w-full appearance-none bg-[var(--input-bg)] border border-[color:var(--input-border)] rounded-lg px-4 py-3 text-sm text-[color:var(--text-primary)] focus:border-core-blue/50 focus:outline-none cursor-pointer"
                     >
-                      <option value="">Select a Service</option>
+                      <option value="" className="bg-[var(--bg-elevated)] text-[color:var(--text-primary)]">Select a Service</option>
                       {services.map((s) => (
-                        <option key={s} value={s}>{s}</option>
+                        <option key={s} value={s} className="bg-[var(--bg-elevated)] text-[color:var(--text-primary)]">{s}</option>
                       ))}
                     </select>
-                    <ChevronDown className="absolute right-3 top-[38px] w-4 h-4 text-muted-text pointer-events-none" />
+                    <ChevronDown className="absolute right-3 top-[38px] w-4 h-4 text-[color:var(--text-secondary)] pointer-events-none" />
                   </div>
                 </div>
 
@@ -243,11 +243,11 @@ export default function Contact() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="glass-card rounded-2xl p-12 text-center"
               >
-                <div className="w-16 h-16 mx-auto rounded-full bg-gff-gradient-soft border border-white/10 flex items-center justify-center mb-4">
+                <div className="w-16 h-16 mx-auto rounded-full bg-gff-gradient-soft border border-[color:var(--border-default)] flex items-center justify-center mb-4">
                   <Check className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-display font-bold text-white mb-2">Message Sent!</h3>
-                <p className="text-muted-text">Our team will get back to you within 24 hours.</p>
+                <h3 className="text-2xl font-display font-bold text-[color:var(--text-primary)] mb-2">Message Sent!</h3>
+                <p className="text-[color:var(--text-secondary)]">Our team will get back to you within 24 hours.</p>
               </motion.div>
             )}
           </motion.div>

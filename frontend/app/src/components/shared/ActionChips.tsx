@@ -25,9 +25,9 @@ export function ActionChips({ chips, className, chipClassName }: ActionChipsProp
           onClick={chip.onClick}
           className={cn(
             'px-4 py-2 rounded-full text-sm font-medium',
-            'bg-white/[0.04] border border-white/[0.10]',
-            'text-white/80 hover:text-white hover:bg-white/[0.08]',
-            'hover:border-white/[0.18] hover:shadow-[0_0_20px_rgba(17,115,188,0.12)]',
+            'bg-[var(--chip-bg)] border border-[color:var(--border-default)]',
+            'text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]',
+            'hover:border-[color:var(--border-hover)] hover:shadow-[0_0_20px_rgba(17,115,188,0.12)]',
             'transition-all duration-300 cursor-pointer',
             chipClassName
           )}

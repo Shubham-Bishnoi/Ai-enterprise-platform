@@ -18,6 +18,14 @@
     --gff-purple-rgb: 107 91 255;
     --gff-blue-rgb: 17 115 188;
     --gff-bright-blue-rgb: 49 93 255;
+    --gff-gradient-red: #ef233c;
+    --gff-gradient-purple: #a855f7;
+    --gff-gradient-blue: #178bff;
+    --gff-hero-surface: #030305;
+    --gff-hero-surface-edge: rgba(3, 3, 5, 0.18);
+    --gff-hero-surface-75: rgba(3, 3, 5, 0.75);
+    --gff-hero-panel-bg: rgba(11, 11, 16, 0.92);
+    --gff-hero-panel-border: rgba(255, 255, 255, 0.08);
   }
 
   /* Dark theme (default) */
@@ -71,6 +79,24 @@
     --status-green-text: #6EE7B7;
     --status-green-border: rgba(16, 185, 129, 0.20);
     --scrollbar-track: #0D0D0D;
+
+    --gff-bg: #030305;
+    --gff-bg-soft: #07080d;
+    --gff-surface: rgba(255, 255, 255, 0.045);
+    --gff-surface-solid: #101014;
+    --gff-surface-elevated: rgba(255, 255, 255, 0.075);
+    --gff-text: #f8fafc;
+    --gff-text-secondary: #a1a1aa;
+    --gff-text-muted: #71717a;
+    --gff-border: rgba(255, 255, 255, 0.10);
+    --gff-border-strong: rgba(255, 255, 255, 0.16);
+    --gff-shadow: rgba(0, 0, 0, 0.45);
+    --gff-overlay: rgba(0, 0, 0, 0.55);
+    --gff-overlay-strong: rgba(0, 0, 0, 0.78);
+    --gff-media-scrim: rgba(0, 0, 0, 0.58);
+    --gff-media-scrim-mid: rgba(0, 0, 0, 0.35);
+    --gff-media-scrim-soft: rgba(0, 0, 0, 0.18);
+    --gff-nav-shadow: 0 4px 30px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.04);
   }
 
   /* Light theme */
@@ -96,26 +122,26 @@
     --ring: 206 83.4% 40.2%;
 
     /* Extended theme tokens */
-    --bg-primary: #F7F8FB;
-    --bg-secondary: #F5F7FA;
+    --bg-primary: #F6F8FC;
+    --bg-secondary: #EEF2F7;
     --bg-elevated: #FFFFFF;
-    --bg-card: rgba(255, 255, 255, 0.85);
+    --bg-card: rgba(255, 255, 255, 0.82);
     --bg-glass: rgba(255, 255, 255, 0.78);
     --bg-glass-strong: rgba(255, 255, 255, 0.92);
-    --text-primary: #101828;
-    --text-secondary: #475467;
-    --text-tertiary: #667085;
-    --text-muted: rgba(15, 23, 42, 0.45);
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-tertiary: #64748B;
+    --text-muted: #64748B;
     --border-default: rgba(15, 23, 42, 0.10);
-    --border-hover: rgba(15, 23, 42, 0.18);
+    --border-hover: rgba(15, 23, 42, 0.16);
     --border-subtle: rgba(15, 23, 42, 0.06);
-    --glow-blue: rgba(17, 115, 188, 0.14);
+    --glow-blue: rgba(17, 115, 188, 0.12);
     --glow-red: rgba(154, 0, 3, 0.10);
     --glow-purple: rgba(107, 91, 255, 0.08);
-    --surface-void: #F7F8FB;
-    --surface-dark: #F0F2F5;
+    --surface-void: #F6F8FC;
+    --surface-dark: rgba(15, 23, 42, 0.06);
     --surface-card: #FFFFFF;
-    --hero-bg: #F0F2F5;
+    --hero-bg: #F6F8FC;
     --input-bg: rgba(15, 23, 42, 0.03);
     --input-border: rgba(15, 23, 42, 0.12);
     --chip-bg: rgba(15, 23, 42, 0.04);
@@ -123,15 +149,43 @@
     --status-green-bg: rgba(16, 185, 129, 0.08);
     --status-green-text: #059669;
     --status-green-border: rgba(16, 185, 129, 0.15);
-    --scrollbar-track: #F7F8FB;
+    --scrollbar-track: #F6F8FC;
+
+    --gff-bg: #F6F8FC;
+    --gff-bg-soft: #EEF2F7;
+    --gff-surface: rgba(255, 255, 255, 0.82);
+    --gff-surface-solid: #FFFFFF;
+    --gff-surface-elevated: rgba(255, 255, 255, 0.92);
+    --gff-text: #0F172A;
+    --gff-text-secondary: #475569;
+    --gff-text-muted: #64748B;
+    --gff-border: rgba(15, 23, 42, 0.10);
+    --gff-border-strong: rgba(15, 23, 42, 0.16);
+    --gff-shadow: rgba(15, 23, 42, 0.08);
+    --gff-overlay: rgba(255, 255, 255, 0.74);
+    --gff-overlay-strong: rgba(255, 255, 255, 0.88);
+    --gff-media-scrim: rgba(15, 23, 42, 0.62);
+    --gff-media-scrim-mid: rgba(15, 23, 42, 0.35);
+    --gff-media-scrim-soft: rgba(15, 23, 42, 0.18);
+    --gff-nav-shadow: 0 4px 30px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(15, 23, 42, 0.06);
   }
 
   body {
     @apply antialiased;
     font-family: 'Inter', system-ui, sans-serif;
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
+    background-color: var(--gff-bg);
+    color: var(--gff-text);
     transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-text-fill-color: var(--gff-text);
+    transition: background-color 9999s ease-in-out 0s;
+    box-shadow: 0 0 0px 1000px var(--gff-surface-elevated) inset;
   }
 
   h1, h2, h3, h4, h5, h6 {

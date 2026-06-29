@@ -10,6 +10,8 @@ export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const onHero = location.pathname === '/' && !location.hash && !scrolled;
+  const lightOnHero = theme === 'light' && onHero;
 
   const desktopNavItems = useMemo(
     () => primaryNavItems.filter((item) => !item.mobileOnly && item.label !== 'Contact'),
@@ -39,7 +41,7 @@ export default function Navbar() {
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${navBackdrop}`}
         style={scrolled ? {
           WebkitBackdropFilter: 'blur(24px)',
-          boxShadow: '0 4px 30px rgba(0,0,0,0.15), 0 0 40px rgba(17,115,188,0.03)',
+          boxShadow: 'var(--gff-nav-shadow)',
         } : {}}
       >
         <div className="mx-auto max-w-[1740px] px-6 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
@@ -75,8 +77,8 @@ export default function Navbar() {
                   </svg>
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-display font-bold text-lg leading-none tracking-tight" style={{ color: 'var(--text-primary)' }}>GFF AI</span>
-                  <span className="text-[10px] tracking-[0.2em] uppercase leading-none mt-0.5" style={{ color: 'var(--text-secondary)' }}>Garage | Foundry | Factory</span>
+                  <span className="font-display font-bold text-lg leading-none tracking-tight" style={{ color: lightOnHero ? '#ffffff' : 'var(--text-primary)' }}>GFF AI</span>
+                  <span className="text-[10px] tracking-[0.2em] uppercase leading-none mt-0.5" style={{ color: lightOnHero ? 'rgba(255,255,255,0.72)' : 'var(--text-secondary)' }}>Garage | Foundry | Factory</span>
                 </div>
               </Link>
             </motion.div>
@@ -89,7 +91,7 @@ export default function Navbar() {
                   to={link.to}
                   end={link.end}
                   className={({ isActive }) =>
-                    `group relative whitespace-nowrap rounded-xl px-2 py-2 text-[12px] leading-none transition-colors duration-300 xl:px-2.5 xl:text-[13px] 2xl:px-3 2xl:text-sm ${isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                    `group relative whitespace-nowrap rounded-xl px-2 py-2 text-[12px] leading-none transition-colors duration-300 xl:px-2.5 xl:text-[13px] 2xl:px-3 2xl:text-sm ${isActive ? (lightOnHero ? 'text-white' : 'text-[var(--text-primary)]') : (lightOnHero ? 'text-white/70 hover:text-white' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]')
                     }`
                   }
                 >
@@ -112,7 +114,7 @@ export default function Navbar() {
               <button
                 onClick={toggleTheme}
                 aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-                className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--border-default)] bg-[var(--chip-bg)] text-[var(--text-secondary)] transition-all duration-300 hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]"
+                className={`relative flex h-9 w-9 items-center justify-center rounded-xl border transition-all duration-300 ${lightOnHero ? 'border-white/12 bg-white/[0.06] text-white/80 hover:border-white/20 hover:text-white' : 'border-[var(--border-default)] bg-[var(--chip-bg)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]'}`}
               >
                 <AnimatePresence mode="wait" initial={false}>
                   {theme === 'dark' ? (
@@ -141,8 +143,8 @@ export default function Navbar() {
 
               <Link
                 to="/portal"
-                className="rounded-2xl border border-[var(--border-default)] bg-[var(--chip-bg)] px-3.5 py-2 text-[13px] transition-all duration-300 hover:border-[var(--border-hover)] whitespace-nowrap xl:px-4 xl:text-sm"
-                style={{ color: 'var(--text-primary)' }}
+                className={`rounded-2xl border px-3.5 py-2 text-[13px] transition-all duration-300 whitespace-nowrap xl:px-4 xl:text-sm ${lightOnHero ? 'border-white/12 bg-white/[0.06] text-white/90 hover:border-white/20' : 'border-[var(--border-default)] bg-[var(--chip-bg)] hover:border-[var(--border-hover)]'}`}
+                style={lightOnHero ? undefined : { color: 'var(--text-primary)' }}
               >
                 Client Login
               </Link>
@@ -166,7 +168,7 @@ export default function Navbar() {
               <button
                 onClick={toggleTheme}
                 aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-                className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--border-default)] text-[var(--text-secondary)]"
+                className={`relative flex h-9 w-9 items-center justify-center rounded-xl border transition-all duration-300 ${lightOnHero ? 'border-white/12 text-white/85' : 'border-[var(--border-default)] text-[var(--text-secondary)]'}`}
               >
                 {theme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
               </button>
@@ -176,7 +178,7 @@ export default function Navbar() {
                 aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
                 aria-expanded={mobileOpen}
                 aria-controls="mobile-navigation"
-                style={{ color: 'var(--text-primary)' }}
+                style={{ color: lightOnHero ? '#ffffff' : 'var(--text-primary)' }}
               >
                 {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -196,7 +198,7 @@ export default function Navbar() {
             id="mobile-navigation"
             className="fixed inset-0 z-40 pt-20"
             style={{
-              background: theme === 'dark' ? 'rgba(13,13,13,0.97)' : 'rgba(247,248,251,0.97)',
+              background: theme === 'dark' ? 'rgba(13,13,13,0.97)' : 'rgba(246,248,252,0.97)',
               backdropFilter: 'blur(40px)',
               WebkitBackdropFilter: 'blur(40px)',
             }}

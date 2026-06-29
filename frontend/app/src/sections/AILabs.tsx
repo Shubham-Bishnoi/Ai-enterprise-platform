@@ -51,7 +51,7 @@ export default function AILabs() {
           transition={{ duration: 0.8 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl lg:text-4xl font-display font-bold text-white mb-3">
+          <h2 className="text-3xl lg:text-4xl font-display font-bold text-[color:var(--text-primary)] mb-3">
             AI LAB & <span className="text-gradient">INNOVATION ENVIRONMENTS</span>
           </h2>
         </motion.div>
@@ -88,13 +88,13 @@ export default function AILabs() {
 
               {/* Content */}
               <div className="p-5">
-                <h3 className="text-base font-display font-bold text-white mb-2 group-hover:text-gradient transition-all">
+                <h3 className="text-base font-display font-bold text-[color:var(--text-primary)] mb-2 group-hover:text-gradient transition-all">
                   {lab.title}
                 </h3>
-                <p className="text-xs text-muted-text leading-relaxed mb-4 line-clamp-3">{lab.desc}</p>
+                <p className="text-xs text-[color:var(--text-secondary)] leading-relaxed mb-4 line-clamp-3">{lab.desc}</p>
                 <button
                   onClick={() => setExpanded(expanded === lab.id ? null : lab.id)}
-                  className="flex items-center gap-1.5 text-xs font-medium text-white/90 hover-text-gradient transition-colors group/btn"
+                  className="flex items-center gap-1.5 text-xs font-medium text-[color:var(--text-primary)] hover-text-gradient transition-colors group/btn"
                 >
                   EXPLORE LAB
                   <ArrowRight className="w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
@@ -123,17 +123,17 @@ export default function AILabs() {
                         <img src={lab.image} alt="AI Lab" className="w-full h-48 object-cover rounded-xl" />
                       </div>
                       <div className="lg:w-2/3">
-                        <h3 className="text-2xl font-display font-bold text-white mb-3">{lab.title}</h3>
-                        <p className="text-muted-text mb-4">{lab.desc}</p>
+                        <h3 className="text-2xl font-display font-bold text-[color:var(--text-primary)] mb-3">{lab.title}</h3>
+                        <p className="text-[color:var(--text-secondary)] mb-4">{lab.desc}</p>
                         <div className="mb-4">
                           <span className="text-xs font-mono text-gradient mb-2 block">FOCUS AREAS</span>
-                          <p className="text-sm text-white/80">{lab.focus}</p>
+                          <p className="text-sm text-[color:var(--text-secondary)]">{lab.focus}</p>
                         </div>
                         <div>
                           <span className="text-xs font-mono text-gradient mb-2 block">TECH STACK</span>
                           <div className="flex flex-wrap gap-2">
                             {lab.tech.map((t) => (
-                              <span key={t} className="px-3 py-1 rounded-full text-xs bg-gff-gradient-soft text-white/90 border border-white/10">
+                              <span key={t} className="px-3 py-1 rounded-full text-xs bg-gff-gradient-soft text-[color:var(--text-primary)] border border-[color:var(--border-default)]">
                                 {t}
                               </span>
                             ))}

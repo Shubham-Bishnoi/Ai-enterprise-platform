@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import { footerColumns, siteContainerClass } from '@/lib/siteContent';
 
 const socials = [
-  { icon: Linkedin, href: '#', label: 'LinkedIn' },
+  { icon: Linkedin, href: 'https://www.linkedin.com/company/gff-ai/', label: 'LinkedIn' },
   { icon: Twitter, href: '#', label: 'Twitter' },
   { icon: Mail, href: '#', label: 'Email' },
   { icon: Youtube, href: '#', label: 'YouTube' },
@@ -58,6 +58,8 @@ export default function Footer() {
                 <a
                   key={social.label}
                   href={social.href}
+                  target="_blank"
+                  rel="noreferrer"
                   aria-label={social.label}
                   className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110"
                   style={{ backgroundColor: 'var(--chip-bg)', color: 'var(--text-secondary)', border: '1px solid var(--border-default)' }}
