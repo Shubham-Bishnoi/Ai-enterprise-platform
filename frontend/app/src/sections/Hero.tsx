@@ -130,7 +130,7 @@ export default function Hero() {
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </button>
                   <button
-                    onClick={() => document.querySelector('#foundry-process')?.scrollIntoView({ behavior: 'smooth' })}
+                    onClick={() => document.querySelector('#interactive-experience')?.scrollIntoView({ behavior: 'smooth' })}
                     className="group flex h-11 w-full max-w-full shrink-0 items-center justify-center gap-2 rounded-2xl px-4 text-[13px] text-white transition-all duration-300 btn-secondary sm:w-auto sm:justify-start lg:w-auto lg:px-4 xl:px-5 xl:text-sm"
                   >
                     <Play className="h-4 w-4" />
