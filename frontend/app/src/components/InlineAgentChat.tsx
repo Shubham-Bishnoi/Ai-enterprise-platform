@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router';
 import {
@@ -12,21 +12,26 @@ import {
   User,
   ChevronRight,
 } from 'lucide-react';
-import type { TalkToAgentSession, AgentMessage, TalkToAgentState } from '@/types/talkToAgent';
-import { quickActionChips, createMockSession, generateMockRecommendation } from '@/lib/mock/talkToAgentMock';
+import {
+  LEGACY_TALK_TO_AGENT_QUICK_ACTIONS,
+  appendLocalMessage,
+  buildOfflineMessage,
+  createLocalSession,
+  createTalkToAgentSession,
+  requestTalkToAgentHandoff,
+  sendTalkToAgentMessage,
+  trackTalkToAgentEvent,
+  triggerTalkToAgentQuickAction,
+} from '@/lib/api/talkToAgentApi';
 import { cn } from '@/lib/utils';
-
-export interface InlineAgentIdentity {
-  id: string;
-  name: string;
-  label?: string;
-  title?: string;
-  subtitle?: string;
-  desc: string;
-  color: string;
-  image?: string;
-  greeting?: string;
-}
+import type {
+  AgentRecommendation,
+  InlineAgentIdentity,
+  NextStepAction,
+  QuickActionChip,
+  TalkToAgentSession,
+  TalkToAgentState,
+} from '@/types/talkToAgent';
 
 interface InlineAgentChatProps {
   selectedAgent?: InlineAgentIdentity;
@@ -37,8 +42,9 @@ export function InlineAgentChat({ selectedAgent }: InlineAgentChatProps) {
   const [session, setSession] = useState<TalkToAgentSession | null>(null);
   const [input, setInput] = useState('');
   const [state, setState] = useState<TalkToAgentState>('welcome');
-  const [recommendation, setRecommendation] = useState<ReturnType<typeof generateMockRecommendation> | null>(null);
+  const [recommendation, setRecommendation] = useState<AgentRecommendation | null>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const sourceSurface = 'homepage_inline_chat';
 
   const handleNavigate = (href?: string) => {
     if (!href) return;
@@ -74,26 +80,6 @@ export function InlineAgentChat({ selectedAgent }: InlineAgentChatProps) {
   };
 
   useEffect(() => {
-    const baseSession = createMockSession();
-    const intro = selectedAgent
-      ? selectedAgent.greeting || `Hello! I'm your ${selectedAgent.name}. ${selectedAgent.subtitle || selectedAgent.desc}. Tell me about your challenge and I will guide your next steps.`
-      : "Hello! I'm GFF AI, your enterprise transformation advisor. How can I help you today? Select a quick action below or type your question.";
-
-    setSession({
-      ...baseSession,
-      messages: [
-        {
-          ...baseSession.messages[0],
-          text: intro,
-        },
-      ],
-    });
-    setState('welcome');
-    setRecommendation(null);
-    setInput('');
-  }, [selectedAgent]);
-
-  useEffect(() => {
     if (!messagesContainerRef.current) return;
     messagesContainerRef.current.scrollTo({
       top: messagesContainerRef.current.scrollHeight,
@@ -101,76 +87,193 @@ export function InlineAgentChat({ selectedAgent }: InlineAgentChatProps) {
     });
   }, [session?.messages, state]);
 
-  const addMessage = (role: 'agent' | 'user', text: string) => {
-    const newMsg: AgentMessage = {
-      id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-      role,
-      text,
-      timestamp: new Date().toISOString(),
-    };
+  const initializeSession = useCallback(async () => {
+    setState('loading');
+    setRecommendation(null);
+    setInput('');
 
+    try {
+      const nextSession = await createTalkToAgentSession(selectedAgent, sourceSurface);
+      setSession(nextSession);
+      setState(nextSession.state);
+    } catch {
+      const fallbackQuickActions = selectedAgent ? [] : LEGACY_TALK_TO_AGENT_QUICK_ACTIONS;
+      const fallbackSession = createLocalSession(selectedAgent, fallbackQuickActions);
+      setSession({
+        ...fallbackSession,
+        messages: [...fallbackSession.messages, buildOfflineMessage()],
+      });
+      setState('welcome');
+    }
+  }, [selectedAgent]);
+
+  useEffect(() => {
+    void initializeSession();
+  }, [initializeSession]);
+
+  const handleBackendFailure = () => {
     setSession((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        messages: [...prev.messages, newMsg],
-        updatedAt: new Date().toISOString(),
-      };
+      if (!prev) {
+        return createLocalSession(selectedAgent, selectedAgent ? [] : LEGACY_TALK_TO_AGENT_QUICK_ACTIONS);
+      }
+
+      return appendLocalMessage(prev, 'agent', buildOfflineMessage().text);
     });
+    setState(recommendation ? 'recommendations' : 'welcome');
   };
 
-  const processAgentResponse = (userText: string) => {
+  const handleNextAction = async (action: NextStepAction) => {
+    if (
+      session &&
+      (action.type === 'request_handoff' || action.type === 'book_workshop')
+    ) {
+      void trackTalkToAgentEvent({
+        eventName: 'talk_to_agent_handoff_requested',
+        source: sourceSurface,
+        sessionId: session.id,
+        payload: { selected_agent_id: session.selectedAgentId, action_type: action.type },
+      });
+
+      try {
+        await requestTalkToAgentHandoff({
+          sessionId: session.id,
+          selectedAgentId: session.selectedAgentId,
+          target: action.type === 'book_workshop' ? 'workshop' : 'human_expert',
+        });
+      } catch {
+        // Keep UI flow intact even if handoff preparation fails.
+      }
+    }
+
+    handleNavigate(action.href);
+  };
+
+  const processAgentResponse = async (userText: string) => {
+    if (!session) return;
     setState('loading');
 
-    setTimeout(() => {
-      const seededPrompt = selectedAgent ? `${selectedAgent.title} ${userText}` : userText;
-      const rec = generateMockRecommendation(seededPrompt);
-      setRecommendation(rec);
+    try {
+      const response = await sendTalkToAgentMessage({
+        sessionId: session.id,
+        message: userText,
+        selectedAgentId: selectedAgent?.id || session.selectedAgentId,
+        sourceSurface,
+      });
 
-      const responseText = `Thank you for sharing! Based on your inputs, I've identified key opportunities for ${rec.detectedIndustry.name} (confidence: ${Math.round(rec.detectedIndustry.confidence * 100)}%).
+      setSession((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          state: response.state,
+          recommendation: response.recommendation,
+          selectedAgentId:
+            response.recommendation.recommendedPaths[0]?.icon || prev.selectedAgentId || selectedAgent?.id || null,
+          messages: [...prev.messages, response.assistantMessage],
+          updatedAt: response.assistantMessage.timestamp,
+        };
+      });
+      setRecommendation(response.recommendation);
+      setState(response.state);
 
-Your profile suggests you're focused on **${rec.roleObjective.split('seeking')[1]?.trim() || 'AI transformation'}**. I recommend exploring the ${rec.recommendedPaths[0].title} approach.
-
-Here are your personalized next steps:`;
-
-      addMessage('agent', responseText);
-      setState('recommendations');
-    }, 1500);
+      void trackTalkToAgentEvent({
+        eventName: 'talk_to_agent_recommendation_shown',
+        source: sourceSurface,
+        sessionId: session.id,
+        payload: {
+          selected_agent_id: selectedAgent?.id || session.selectedAgentId,
+          recommended_path_count: response.recommendation.recommendedPaths.length,
+        },
+      });
+    } catch {
+      handleBackendFailure();
+    }
   };
 
-  const handleQuickAction = (prompt: string) => {
+  const handleQuickAction = async (chip: QuickActionChip) => {
     if (!session) return;
-    addMessage('user', prompt);
-    processAgentResponse(prompt);
+
+    setSession((prev) => (prev ? appendLocalMessage(prev, 'user', chip.prompt) : prev));
+    void trackTalkToAgentEvent({
+      eventName: 'talk_to_agent_quick_action_clicked',
+      source: sourceSurface,
+      sessionId: session.id,
+      payload: {
+        selected_agent_id: selectedAgent?.id || session.selectedAgentId,
+        quick_action_id: chip.id,
+      },
+    });
+
+    if (selectedAgent?.id || session.selectedAgentId) {
+      setState('loading');
+      try {
+        const response = await triggerTalkToAgentQuickAction({
+          sessionId: session.id,
+          quickActionId: chip.id,
+          selectedAgentId: selectedAgent?.id || session.selectedAgentId,
+        });
+
+        setSession((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            state: response.state,
+            recommendation: response.recommendation,
+            selectedAgentId:
+              response.recommendation.recommendedPaths[0]?.icon || prev.selectedAgentId || selectedAgent?.id || null,
+            messages: [...prev.messages, response.assistantMessage],
+            updatedAt: response.assistantMessage.timestamp,
+          };
+        });
+        setRecommendation(response.recommendation);
+        setState(response.state);
+
+        void trackTalkToAgentEvent({
+          eventName: 'talk_to_agent_recommendation_shown',
+          source: sourceSurface,
+          sessionId: session.id,
+          payload: {
+            selected_agent_id: selectedAgent?.id || session.selectedAgentId,
+            recommended_path_count: response.recommendation.recommendedPaths.length,
+          },
+        });
+      } catch {
+        handleBackendFailure();
+      }
+      return;
+    }
+
+    await processAgentResponse(chip.prompt);
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim() || !session) return;
     const text = input.trim();
-    addMessage('user', text);
+
+    setSession((prev) => (prev ? appendLocalMessage(prev, 'user', text) : prev));
     setInput('');
-    processAgentResponse(text);
+
+    void trackTalkToAgentEvent({
+      eventName: 'talk_to_agent_message_sent',
+      source: sourceSurface,
+      sessionId: session.id,
+      payload: {
+        selected_agent_id: selectedAgent?.id || session.selectedAgentId,
+        message_length: text.length,
+      },
+    });
+
+    await processAgentResponse(text);
   };
 
   const resetSession = () => {
-    const baseSession = createMockSession();
-    const intro = selectedAgent
-      ? selectedAgent.greeting || `Hello! I'm your ${selectedAgent.name}. ${selectedAgent.subtitle || selectedAgent.desc}. Tell me about your challenge and I will guide your next steps.`
-      : "Hello! I'm GFF AI, your enterprise transformation advisor. How can I help you today? Select a quick action below or type your question.";
-
-    setSession({
-      ...baseSession,
-      messages: [
-        {
-          ...baseSession.messages[0],
-          text: intro,
-        },
-      ],
-    });
-    setState('welcome');
-    setRecommendation(null);
-    setInput('');
+    void initializeSession();
   };
+
+  const activeQuickActions = session?.quickActions?.length
+    ? session.quickActions
+    : selectedAgent
+      ? []
+      : LEGACY_TALK_TO_AGENT_QUICK_ACTIONS;
 
   return (
     <motion.section
@@ -345,7 +448,7 @@ Here are your personalized next steps:`;
                     {recommendation.nextStepActions.map((action, i) => (
                       <button
                         key={i}
-                        onClick={() => handleNavigate(action.href)}
+                        onClick={() => void handleNextAction(action)}
                         className="flex w-full items-center justify-between rounded-xl bg-gff-gradient p-3 text-white transition-all hover:shadow-[0_0_20px_rgba(17,115,188,0.3)]"
                       >
                         <span className="text-xs font-medium">{action.title}</span>
@@ -366,10 +469,10 @@ Here are your personalized next steps:`;
             <div>
               <span className="mb-4 block text-[10px] uppercase tracking-wider text-[color:var(--text-tertiary)]">Quick Actions</span>
               <div className="flex flex-wrap gap-3">
-                {quickActionChips.map((chip) => (
+                {activeQuickActions.map((chip) => (
                   <button
                     key={chip.id}
-                    onClick={() => handleQuickAction(chip.prompt)}
+                    onClick={() => void handleQuickAction(chip)}
                     className="rounded-full border border-[color:var(--border-default)] bg-[var(--chip-bg)] px-3 py-1.5 text-[11px] text-[color:var(--text-secondary)] transition-all duration-300 hover:border-[color:var(--border-hover)] hover:text-[color:var(--text-primary)]"
                   >
                     {chip.label}
