@@ -1,6 +1,23 @@
-// Talk to Agent Types - API-ready contracts for FastAPI integration
+export type TalkToAgentState =
+  | 'welcome'
+  | 'guided_discovery'
+  | 'recommendations'
+  | 'next_actions'
+  | 'loading'
+  | 'error'
+  | 'clarifying';
 
-export type TalkToAgentState = 'welcome' | 'guided_discovery' | 'recommendations' | 'next_actions' | 'loading' | 'error';
+export interface InlineAgentIdentity {
+  id: string;
+  name: string;
+  label?: string;
+  title?: string;
+  subtitle?: string;
+  desc: string;
+  color: string;
+  image?: string;
+  greeting?: string;
+}
 
 export interface QuickActionChip {
   id: string;
@@ -40,17 +57,22 @@ export interface RelevantLab {
   description: string;
 }
 
+export interface NextStepAction {
+  title: string;
+  cta: string;
+  href?: string;
+  type?: string;
+  payload?: Record<string, unknown>;
+}
+
 export interface AgentRecommendation {
   detectedIndustry: DetectedIndustry;
   roleObjective: string;
   recommendedPaths: RecommendedPath[];
   relevantSolutions: RelevantSolution[];
   relevantLabs: RelevantLab[];
-  nextStepActions: {
-    title: string;
-    cta: string;
-    href: string;
-  }[];
+  nextStepActions: NextStepAction[];
+  suggestedQuestions?: string[];
 }
 
 export interface TalkToAgentSession {
@@ -58,23 +80,8 @@ export interface TalkToAgentSession {
   state: TalkToAgentState;
   messages: AgentMessage[];
   recommendation?: AgentRecommendation;
+  quickActions?: QuickActionChip[];
+  selectedAgentId?: string | null;
   createdAt: string;
   updatedAt: string;
-}
-
-// API Request/Response types for FastAPI
-export interface TalkToAgentStartRequest {
-  initialPrompt?: string;
-  quickActionId?: string;
-}
-
-export interface TalkToAgentMessageRequest {
-  sessionId: string;
-  message: string;
-}
-
-export interface TalkToAgentResponse {
-  success: boolean;
-  session?: TalkToAgentSession;
-  error?: string;
 }
