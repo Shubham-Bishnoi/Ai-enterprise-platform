@@ -3,3 +3,11 @@ frontend/app/node_modules/
 frontend/app/dist/
 frontend/gffai.zip
 *.log
+gffenv/
+**/__pycache__/
+*.pyc
+backend/.env
+ai/.env
+AI/.env
+frontend/app/.env
+backend/dev_phase05.db

@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, MessageSquare } from 'lucide-react';
-import { InlineAgentChat, type InlineAgentIdentity } from '@/components/InlineAgentChat';
+import { InlineAgentChat } from '@/components/InlineAgentChat';
+import { fetchTalkToAgentAgents, trackTalkToAgentEvent } from '@/lib/api/talkToAgentApi';
+import type { InlineAgentIdentity } from '@/types/talkToAgent';
 
-const agents = [
+const fallbackAgents: InlineAgentIdentity[] = [
   {
     id: 'strategy',
     name: 'Strategy Agent',
@@ -62,6 +64,7 @@ const agents = [
 ];
 
 export default function TalkToAgent() {
+  const [agents, setAgents] = useState<InlineAgentIdentity[]>(fallbackAgents);
   const [showInlineChat, setShowInlineChat] = useState(false);
   const [activeAgent, setActiveAgent] = useState<InlineAgentIdentity | undefined>(undefined);
   const [chatVersion, setChatVersion] = useState(0);
@@ -71,7 +74,59 @@ export default function TalkToAgent() {
     setActiveAgent(agent);
     setShowInlineChat(true);
     setChatVersion((prev) => prev + 1);
+
+    void trackTalkToAgentEvent({
+      eventName: 'talk_to_agent_opened',
+      source: 'homepage_inline_chat',
+      payload: { selected_agent_id: agent?.id ?? null },
+    });
+
+    if (agent) {
+      void trackTalkToAgentEvent({
+        eventName: 'selected_agent_clicked',
+        source: 'homepage_inline_chat',
+        payload: { selected_agent_id: agent.id },
+      });
+    }
   };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadAgents = async () => {
+      try {
+        const backendAgents = await fetchTalkToAgentAgents();
+        if (cancelled) return;
+
+        const fallbackMap = new Map(fallbackAgents.map((agent) => [agent.id, agent]));
+        const mergedAgents = backendAgents.map((agent) => {
+          const fallback = fallbackMap.get(agent.id);
+          return {
+            id: agent.id,
+            name: agent.name,
+            label: fallback?.label || agent.name.toUpperCase(),
+            title: agent.name,
+            subtitle: agent.subtitle || agent.title,
+            desc: agent.description || agent.title,
+            color: fallback?.color || '#1173BC',
+            image: fallback?.image,
+            greeting: agent.greeting || fallback?.greeting,
+          } satisfies InlineAgentIdentity;
+        });
+
+        setAgents(mergedAgents.length > 0 ? mergedAgents : fallbackAgents);
+      } catch {
+        if (cancelled) return;
+        setAgents(fallbackAgents);
+      }
+    };
+
+    void loadAgents();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!showInlineChat) return;
@@ -168,7 +223,7 @@ function AgentCard({
   index,
   onSelect,
 }: {
-  agent: (typeof agents)[number];
+  agent: InlineAgentIdentity;
   index: number;
   onSelect: () => void;
 }) {
