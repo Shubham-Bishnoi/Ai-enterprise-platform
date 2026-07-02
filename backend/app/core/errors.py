@@ -33,6 +33,7 @@ def register_error_handlers(app: FastAPI) -> None:
                 "success": False,
                 "data": None,
                 "error": exc.error.model_dump(),
+                "meta": None,
             },
         )
 
@@ -48,5 +49,6 @@ def register_error_handlers(app: FastAPI) -> None:
                     message="An unexpected error occurred.",
                     details={"reason": str(exc)},
                 ).model_dump(),
+                "meta": None,
             },
         )

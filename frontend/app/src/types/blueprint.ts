@@ -18,6 +18,18 @@ export interface BlueprintFormInput {
   riskAppetite?: string;
 }
 
+export interface BlueprintFormOptions {
+  industries: string[];
+  companySizes: string[];
+  topPriorities: string[];
+  aiJourneyStages: string[];
+  biggestChallenges: string[];
+  dataReadiness: string[];
+  existingSystems: string[];
+  leadershipCommitment: string[];
+  riskAppetite: string[];
+}
+
 export interface AIReadinessScore {
   score: number;
   category: ScoreCategory;
@@ -38,6 +50,10 @@ export interface AIOpportunity {
   complexity: 'High' | 'Medium' | 'Low';
   timeline: string;
   category: string;
+  businessArea?: string;
+  recommendedAgent?: string;
+  whyItMatters?: string;
+  suggestedFirstStep?: string;
 }
 
 export interface GFFSolution {
@@ -75,6 +91,7 @@ export interface GovernanceFramework {
   pillars: {
     name: string;
     controls: string[];
+    priority?: string;
   }[];
 }
 
@@ -84,9 +101,17 @@ export interface BusinessImpact {
   description: string;
 }
 
+export interface RecommendedAgentSummary {
+  name: string;
+  purpose: string;
+  trigger: string;
+}
+
 export interface BlueprintResult {
   id: string;
+  requestId?: string;
   generatedAt: string;
+  profileSummary?: string;
   readinessScore: AIReadinessScore;
   opportunities: AIOpportunity[];
   recommendedSolutions: GFFSolution[];
@@ -95,7 +120,17 @@ export interface BlueprintResult {
   operatingModel: AIOperatingModel;
   architecture: AIArchitecture;
   governance: GovernanceFramework;
+  recommendedAgents?: RecommendedAgentSummary[];
+  assumptions?: string[];
+  warnings?: string[];
+  handoffSummary?: {
+    workshopType: string;
+    executiveSummary: string;
+    recommendedScope: string[];
+    suggestedAttendees: string[];
+  };
   nextActions: {
+    actionKey?: string;
     title: string;
     description: string;
     cta: string;
@@ -109,7 +144,7 @@ export interface BlueprintGenerateRequest {
 
 export interface BlueprintGenerateResponse {
   success: boolean;
-  result?: BlueprintResult;
+  data?: BlueprintResult;
   error?: string;
 }
 

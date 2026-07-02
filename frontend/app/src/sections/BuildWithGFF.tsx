@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   MessageSquare,
@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { TalkToAgentDrawer } from '@/components/drawers/TalkToAgentDrawer';
 import { BlueprintModal } from '@/components/modals/BlueprintModal';
+import { FALLBACK_BLUEPRINT_OPTIONS, getBlueprintOptions } from '@/lib/api/blueprintApi';
 import type { BlueprintFormInput } from '@/types/blueprint';
 
 export default function BuildWithGFF() {
@@ -144,19 +145,41 @@ function TalkToAgentCard({ onOpenAgent }: { onOpenAgent: () => void }) {
 function GenerateBlueprintCard() {
   const [industry, setIndustry] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [industries, setIndustries] = useState<string[]>(
+    FALLBACK_BLUEPRINT_OPTIONS.industries.slice(0, 6),
+  );
 
-  const industries = ['Healthcare', 'Banking', 'Manufacturing', 'Retail', 'Energy', 'Insurance'];
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadOptions = async () => {
+      try {
+        const options = await getBlueprintOptions();
+        if (cancelled || options.industries.length === 0) return;
+        setIndustries(options.industries.slice(0, 6));
+      } catch {
+        if (cancelled) return;
+        setIndustries(FALLBACK_BLUEPRINT_OPTIONS.industries.slice(0, 6));
+      }
+    };
+
+    void loadOptions();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleQuickGenerate = () => {
     setShowModal(true);
   };
 
   const quickFormData: BlueprintFormInput = {
-    industry: industry || 'Enterprise',
+    industry: industry || 'Other',
     companySize: 'Enterprise',
-    topPriorities: ['Operational Efficiency', 'Revenue Growth'],
-    aiJourneyStage: 'Exploring',
-    biggestChallenge: 'Integration',
+    topPriorities: ['Productivity', 'Revenue Growth'],
+    aiJourneyStage: 'Exploring AI',
+    biggestChallenge: 'Legacy Systems',
     email: 'demo@enterprise.com',
   };
 

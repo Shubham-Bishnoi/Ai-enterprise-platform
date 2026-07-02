@@ -35,3 +35,9 @@ class MockLLMClient:
             f"I've captured the current discovery profile ({profile_summary or 'limited profile data'}) "
             "and prepared next actions to move toward a recommendation or expert handoff."
         )
+
+    def generate_blueprint_summary(self, *, blueprint, profile) -> str:
+        return (
+            f"Deterministic blueprint summary for a {profile.industry} organization at the "
+            f"{profile.ai_journey_stage} stage, centered on {', '.join(profile.top_priorities)}."
+        )

@@ -15,6 +15,7 @@ class APIResponse(BaseModel, Generic[T]):
     success: bool = True
     data: T | None = None
     error: ErrorResponse | None = None
+    meta: dict[str, Any] | None = None
 
 
 class SuccessEnvelope(BaseModel):

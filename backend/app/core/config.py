@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     nvidia_api_key: str | None = None
     nvidia_model: str = "meta/llama-3.1-8b-instruct"
     nvidia_base_url: str = "https://integrate.api.nvidia.com/v1"
+    blueprint_engine_version: str = "v1"
+    blueprint_default_industry: str = "generic-enterprise"
 
     backend_cors_origins: Annotated[list[str], NoDecode] = [
         "http://localhost:5173",

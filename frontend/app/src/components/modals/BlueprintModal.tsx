@@ -17,7 +17,14 @@ import {
   CalendarDays,
 } from 'lucide-react';
 import type { BlueprintResult, BlueprintFormInput } from '@/types/blueprint';
-import { generateMockBlueprint } from '@/lib/mock/blueprintMock';
+import {
+  BLUEPRINT_BACKEND_ERROR_MESSAGE,
+  emailBlueprint,
+  exportBlueprint,
+  generateBlueprint,
+  handoffBlueprint,
+  trackBlueprintEvent,
+} from '@/lib/api/blueprintApi';
 import { cn } from '@/lib/utils';
 
 interface BlueprintModalProps {
@@ -29,6 +36,9 @@ interface BlueprintModalProps {
 export function BlueprintModal({ isOpen, onClose, formData }: BlueprintModalProps) {
   const [result, setResult] = useState<BlueprintResult | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isActionPending, setIsActionPending] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'opportunities' | 'roadmap' | 'architecture' | 'governance'>('overview');
   const [animatedScore, setAnimatedScore] = useState(0);
   const resultsContentRef = useRef<HTMLDivElement | null>(null);
@@ -41,34 +51,77 @@ export function BlueprintModal({ isOpen, onClose, formData }: BlueprintModalProp
 
   useEffect(() => {
     if (isOpen && formData.industry) {
+      let isCancelled = false;
       setIsGenerating(true);
       setResult(null);
       setAnimatedScore(0);
       setActiveTab('overview');
+      setActionMessage(null);
+      setErrorMessage(null);
 
-      const timer = setTimeout(() => {
-        const blueprint = generateMockBlueprint(formData);
-        setResult(blueprint);
-        setIsGenerating(false);
+      void trackBlueprintEvent({
+        eventName: 'blueprint_generate_started',
+        source: 'homepage_blueprint_frontend',
+        payload: {
+          industry: formData.industry,
+          company_size: formData.companySize,
+          top_priorities: formData.topPriorities,
+        },
+      });
 
-        // Animate score
-        const targetScore = blueprint.readinessScore.score;
-        let current = 0;
-        const interval = setInterval(() => {
-          current += 2;
-          if (current >= targetScore) {
-            current = targetScore;
-            clearInterval(interval);
-          }
-          setAnimatedScore(current);
-        }, 30);
+      const loadBlueprint = async () => {
+        try {
+          const blueprint = await generateBlueprint(formData);
+          if (isCancelled) return;
+          setResult(blueprint);
+          setIsGenerating(false);
+          void trackBlueprintEvent({
+            eventName: 'blueprint_generate_completed',
+            source: 'homepage_blueprint_frontend',
+            payload: {
+              blueprint_id: blueprint.id,
+              readiness_score: blueprint.readinessScore.score,
+            },
+          });
+        } catch {
+          if (isCancelled) return;
+          setResult(null);
+          setIsGenerating(false);
+          setErrorMessage(BLUEPRINT_BACKEND_ERROR_MESSAGE);
+          void trackBlueprintEvent({
+            eventName: 'blueprint_generate_failed',
+            source: 'homepage_blueprint_frontend',
+            payload: {
+              industry: formData.industry,
+            },
+          });
+        }
+      };
 
-        return () => clearInterval(interval);
-      }, 2000);
+      void loadBlueprint();
 
-      return () => clearTimeout(timer);
+      return () => {
+        isCancelled = true;
+      };
     }
   }, [isOpen, formData]);
+
+  useEffect(() => {
+    if (!result) return;
+
+    const targetScore = result.readinessScore.score;
+    let current = 0;
+    const interval = window.setInterval(() => {
+      current += 2;
+      if (current >= targetScore) {
+        current = targetScore;
+        window.clearInterval(interval);
+      }
+      setAnimatedScore(current);
+    }, 30);
+
+    return () => window.clearInterval(interval);
+  }, [result]);
 
   useEffect(() => {
     if (!result || isGenerating) return;
@@ -89,6 +142,75 @@ export function BlueprintModal({ isOpen, onClose, formData }: BlueprintModalProp
     });
   };
 
+  const scrollToSection = (targetId: string) => {
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handleNextAction = async (action: BlueprintResult['nextActions'][number]) => {
+    if (!result?.id || isActionPending) return;
+
+    const actionKey = action.actionKey || '';
+    setActionMessage(null);
+
+    if (actionKey === 'talk_to_agent') {
+      void trackBlueprintEvent({
+        eventName: 'blueprint_handoff_clicked',
+        source: 'homepage_blueprint_frontend',
+        payload: { blueprint_id: result.id, action_key: actionKey },
+      });
+      scrollToSection('talk-to-agent');
+      onClose();
+      return;
+    }
+
+    try {
+      setIsActionPending(true);
+
+      if (actionKey === 'download_blueprint') {
+        void trackBlueprintEvent({
+          eventName: 'blueprint_export_clicked',
+          source: 'homepage_blueprint_frontend',
+          payload: { blueprint_id: result.id },
+        });
+        await exportBlueprint(result.id);
+        setActionMessage('Export is queued. This action will be available soon.');
+        return;
+      }
+
+      if (actionKey === 'email_blueprint') {
+        void trackBlueprintEvent({
+          eventName: 'blueprint_email_clicked',
+          source: 'homepage_blueprint_frontend',
+          payload: { blueprint_id: result.id },
+        });
+        await emailBlueprint(result.id);
+        setActionMessage('Email delivery is queued. This action will be available soon.');
+        return;
+      }
+
+      void trackBlueprintEvent({
+        eventName: 'blueprint_handoff_clicked',
+        source: 'homepage_blueprint_frontend',
+        payload: { blueprint_id: result.id, action_key: actionKey },
+      });
+      const handoff = await handoffBlueprint(result.id);
+      setActionMessage(
+        handoff.handoff_summary.executive_summary ||
+          'Next-step handoff is ready for the team review.',
+      );
+      if (actionKey === 'book_workshop' || actionKey === 'request_proposal') {
+        scrollToSection('contact');
+      }
+    } catch {
+      setActionMessage('This action will be available soon.');
+    } finally {
+      setIsActionPending(false);
+    }
+  };
+
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -100,6 +222,25 @@ export function BlueprintModal({ isOpen, onClose, formData }: BlueprintModalProp
       document.body.style.overflow = '';
     };
   }, [isOpen]);
+
+  const activeTabPanel = (() => {
+    if (!result) return null;
+
+    switch (activeTab) {
+      case 'overview':
+        return <OverviewTab key="overview" result={result} />;
+      case 'opportunities':
+        return <OpportunitiesTab key="opportunities" result={result} />;
+      case 'roadmap':
+        return <RoadmapTab key="roadmap" result={result} />;
+      case 'architecture':
+        return <ArchitectureTab key="architecture" result={result} />;
+      case 'governance':
+        return <GovernanceTab key="governance" result={result} />;
+      default:
+        return <OverviewTab key="overview_fallback" result={result} />;
+    }
+  })();
 
   return (
     <AnimatePresence>
@@ -204,6 +345,32 @@ export function BlueprintModal({ isOpen, onClose, formData }: BlueprintModalProp
               </div>
             )}
 
+            {!isGenerating && errorMessage && !result && (
+              <div className="px-8 pb-8 flex flex-col items-center justify-center py-14 text-center">
+                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-amber-500/20 bg-amber-500/[0.08]">
+                  <Sparkles className="h-6 w-6 text-amber-400" />
+                </div>
+                <h3 className="mb-2 text-xl font-display font-bold text-[color:var(--text-primary)]">Blueprint Unavailable</h3>
+                <p className="max-w-md text-sm text-[color:var(--text-secondary)]">
+                  {errorMessage}
+                </p>
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                  <button
+                    onClick={onClose}
+                    className="rounded-2xl border border-[color:var(--border-default)] bg-[var(--chip-bg)] px-4 py-2 text-sm text-[color:var(--text-primary)] transition-colors hover:border-[color:var(--border-hover)]"
+                  >
+                    Close
+                  </button>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="rounded-2xl bg-gff-gradient px-4 py-2 text-sm font-medium text-white"
+                  >
+                    Retry
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Results */}
             {result && !isGenerating && (
               <>
@@ -297,21 +464,7 @@ export function BlueprintModal({ isOpen, onClose, formData }: BlueprintModalProp
                 {/* Tab Content */}
                 <div ref={resultsContentRef} className="px-8 pb-14 overflow-y-auto max-h-[56vh] lg:max-h-[58vh]">
                   <AnimatePresence mode="wait">
-                    {activeTab === 'overview' && (
-                      <OverviewTab key="overview" result={result} />
-                    )}
-                    {activeTab === 'opportunities' && (
-                      <OpportunitiesTab key="opportunities" result={result} />
-                    )}
-                    {activeTab === 'roadmap' && (
-                      <RoadmapTab key="roadmap" result={result} />
-                    )}
-                    {activeTab === 'architecture' && (
-                      <ArchitectureTab key="architecture" result={result} />
-                    )}
-                    {activeTab === 'governance' && (
-                      <GovernanceTab key="governance" result={result} />
-                    )}
+                    {activeTabPanel}
                   </AnimatePresence>
 
                   {/* Next Actions */}
@@ -324,6 +477,8 @@ export function BlueprintModal({ isOpen, onClose, formData }: BlueprintModalProp
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.2 + i * 0.1 }}
+                          onClick={() => void handleNextAction(action)}
+                          disabled={isActionPending}
                           className={cn(
                             'p-4 rounded-xl border text-left transition-all duration-300',
                             i === 0
@@ -339,6 +494,11 @@ export function BlueprintModal({ isOpen, onClose, formData }: BlueprintModalProp
                         </motion.button>
                       ))}
                     </div>
+                    {actionMessage && (
+                      <div className="rounded-xl border border-[color:var(--border-subtle)] bg-[var(--bg-glass)] px-4 py-3 text-sm text-[color:var(--text-secondary)]">
+                        {actionMessage}
+                      </div>
+                    )}
                   </div>
                 </div>
               </>
@@ -359,6 +519,16 @@ function OverviewTab({ result }: { result: BlueprintResult }) {
       exit={{ opacity: 0, y: -10 }}
       className="space-y-4"
     >
+      {result.profileSummary && (
+        <div className="rounded-xl border border-[color:var(--border-subtle)] bg-[var(--bg-glass)] p-4">
+          <h4 className="mb-2 text-sm font-display font-bold text-[color:var(--text-primary)] flex items-center gap-2">
+            <Target className="w-4 h-4 text-core-blue" />
+            Profile Summary
+          </h4>
+          <p className="text-sm leading-relaxed text-[color:var(--text-secondary)]">{result.profileSummary}</p>
+        </div>
+      )}
+
       {/* Top Opportunities */}
       <div>
         <h4 className="text-sm font-display font-bold text-[color:var(--text-primary)] mb-3 flex items-center gap-2">
@@ -470,6 +640,11 @@ function OpportunitiesTab({ result }: { result: BlueprintResult }) {
                 <span className="px-2 py-0.5 rounded-full text-[10px] bg-[var(--chip-bg)] text-[color:var(--text-tertiary)]">{opp.category}</span>
               </div>
               <p className="text-xs text-[color:var(--text-secondary)]">{opp.description}</p>
+              {opp.whyItMatters && (
+                <p className="mt-2 text-[10px] text-[color:var(--text-tertiary)]">
+                  Why it matters: {opp.whyItMatters}
+                </p>
+              )}
             </div>
             <div className="flex flex-col items-end gap-1 flex-shrink-0">
               <span className={cn(
@@ -612,6 +787,30 @@ function ArchitectureTab({ result }: { result: BlueprintResult }) {
           ))}
         </div>
       </div>
+
+      {result.recommendedAgents && result.recommendedAgents.length > 0 && (
+        <div className="mt-4">
+          <h4 className="text-sm font-display font-bold text-[color:var(--text-primary)] mb-2 flex items-center gap-2">
+            <Bot className="w-4 h-4 text-core-blue" />
+            Recommended Agents
+          </h4>
+          <div className="space-y-2">
+            {result.recommendedAgents.map((agent, i) => (
+              <motion.div
+                key={`${agent.name}-${i}`}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.08 }}
+                className="rounded-xl border border-[color:var(--border-subtle)] bg-[var(--bg-glass)] p-3"
+              >
+                <div className="text-sm font-medium text-[color:var(--text-primary)]">{agent.name}</div>
+                <div className="mt-1 text-xs text-[color:var(--text-secondary)]">{agent.purpose}</div>
+                <div className="mt-2 text-[10px] text-[color:var(--text-tertiary)]">{agent.trigger}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -645,6 +844,35 @@ function GovernanceTab({ result }: { result: BlueprintResult }) {
           </div>
         </motion.div>
       ))}
+
+      {(result.warnings?.length || result.assumptions?.length) && (
+        <div className="grid gap-3 pt-2 md:grid-cols-2">
+          {result.warnings && result.warnings.length > 0 && (
+            <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-4">
+              <h5 className="mb-2 text-sm font-bold text-[color:var(--text-primary)]">Warnings</h5>
+              <ul className="space-y-1">
+                {result.warnings.map((warning, index) => (
+                  <li key={index} className="text-xs text-[color:var(--text-secondary)]">
+                    {warning}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {result.assumptions && result.assumptions.length > 0 && (
+            <div className="rounded-xl border border-[color:var(--border-subtle)] bg-[var(--bg-glass)] p-4">
+              <h5 className="mb-2 text-sm font-bold text-[color:var(--text-primary)]">Assumptions</h5>
+              <ul className="space-y-1">
+                {result.assumptions.map((assumption, index) => (
+                  <li key={index} className="text-xs text-[color:var(--text-secondary)]">
+                    {assumption}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
     </motion.div>
   );
 }

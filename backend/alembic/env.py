@@ -5,10 +5,13 @@ from sqlalchemy import engine_from_config, pool
 
 from app.core.config import get_settings
 from app.db.base import Base
+from app.models.blueprint import BlueprintOptionSet, BlueprintRequest, BlueprintResult  # noqa: F401
 from app.models.agent import Agent  # noqa: F401
 from app.models.analytics import AnalyticsEvent  # noqa: F401
 from app.models.chat import ChatMessage, ChatSession  # noqa: F401
+from app.models.industry import IndustryPack  # noqa: F401
 from app.models.lead import Lead  # noqa: F401
+from app.models.use_case import UseCase  # noqa: F401
 
 config = context.config
 if config.config_file_name is not None:

@@ -3,13 +3,19 @@ import json
 from openai import OpenAI
 from pydantic import BaseModel, Field
 
+from gff_ai.schemas.blueprint import BlueprintOutput
 from gff_ai.schemas.profile import ExtractedProfile
+from gff_ai.schemas.profile import BlueprintProfile
 
 
 class SpecialistResponsePayload(BaseModel):
     specialist_response: str = Field(min_length=1)
     reasoning_summary: str = Field(min_length=1)
     suggested_questions: list[str] = Field(default_factory=list)
+
+
+class BlueprintSummaryPayload(BaseModel):
+    profile_summary: str = Field(min_length=1)
 
 
 class OpenAIClient:
@@ -151,3 +157,44 @@ class OpenAIClient:
         if payload.suggested_questions:
             return f"{payload.specialist_response}\n\nSuggested follow-up: {payload.suggested_questions[0]}"
         return payload.specialist_response
+
+    def generate_blueprint_summary(
+        self,
+        *,
+        blueprint: BlueprintOutput,
+        profile: BlueprintProfile,
+    ) -> str:
+        if not self.api_key:
+            raise ValueError("OPENAI_API_KEY is required when mock mode is disabled.")
+        client = OpenAI(api_key=self.api_key, base_url=self.base_url)
+        response = client.chat.completions.create(
+            model=self.model,
+            temperature=0.2,
+            response_format={"type": "json_object"},
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are the GFF AI blueprint summarizer. "
+                        "Return strict JSON only with key profile_summary. "
+                        "Be concise, enterprise-grade, deterministic in tone, and do not promise guaranteed ROI."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": json.dumps(
+                        {
+                            "profile": profile.model_dump(),
+                            "readiness_category": blueprint.readiness_category,
+                            "top_opportunities": [item.title for item in blueprint.top_opportunities[:3]],
+                            "recommended_solutions": [item.name for item in blueprint.recommended_solutions[:3]],
+                        }
+                    ),
+                },
+            ],
+        )
+        content = response.choices[0].message.content
+        if not content:
+            raise ValueError("Provider returned an empty blueprint summary response.")
+        payload = BlueprintSummaryPayload.model_validate(json.loads(content))
+        return payload.profile_summary

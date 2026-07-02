@@ -1,6 +1,9 @@
 # GFF AI Backend
 
-Phase 0 backend foundation for Talk to Agent.
+Backend foundation for:
+
+- Phase 0 Talk-to-Agent
+- Phase 1 Blueprint Backend + AI Blueprint Engine
 
 ## Stack
 
@@ -27,7 +30,7 @@ Phase 0 backend foundation for Talk to Agent.
 
 - Default production/local database uses PostgreSQL via `DATABASE_URL`.
 - Tests can run on SQLite without changing app code.
-- Create tables and seed agents:
+- Create tables and seed Phase 0 + Phase 1 data:
   `python -m app.seed.seed_all`
 
 ## Run
@@ -43,7 +46,7 @@ Health endpoint:
 
 `GET http://127.0.0.1:8000/api/v1/health`
 
-## Phase 0 APIs
+## APIs
 
 - `GET /api/v1/health`
 - `GET /api/v1/agents`
@@ -54,6 +57,20 @@ Health endpoint:
 - `POST /api/v1/agents/quick-action`
 - `POST /api/v1/agents/handoff`
 - `POST /api/v1/analytics/events`
+- `GET /api/v1/blueprint/options`
+- `POST /api/v1/blueprint/generate`
+- `GET /api/v1/blueprint/{blueprint_id}`
+- `POST /api/v1/blueprint/{blueprint_id}/regenerate`
+- `POST /api/v1/blueprint/{blueprint_id}/export`
+- `POST /api/v1/blueprint/{blueprint_id}/email`
+- `POST /api/v1/blueprint/{blueprint_id}/handoff`
+
+## Phase 1 Blueprint Notes
+
+- Blueprint requests/results persist to the database.
+- Blueprint options, industry packs, and use cases are seeded on startup.
+- `ENABLE_AI_MOCK_MODE=true` supports deterministic Blueprint generation without an external LLM key.
+- Real-provider mode keeps deterministic scoring in code and uses the provider only for summary wording with deterministic fallback.
 
 ## Mock Mode
 

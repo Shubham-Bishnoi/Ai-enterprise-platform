@@ -8,7 +8,10 @@ from app.core.cors import add_cors_middleware
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
 from app.db.session import create_db_and_tables, get_session_factory
+from app.seed.seed_blueprint_taxonomy import seed_blueprint_taxonomy
 from app.seed.seed_agents import seed_agents
+from app.seed.seed_industries import seed_industries
+from app.seed.seed_use_cases import seed_use_cases
 
 
 @asynccontextmanager
@@ -16,6 +19,9 @@ async def lifespan(_: FastAPI):
     create_db_and_tables()
     with get_session_factory()() as db:
         seed_agents(db)
+        seed_blueprint_taxonomy(db)
+        seed_industries(db)
+        seed_use_cases(db)
     yield
 
 

@@ -51,10 +51,13 @@ def reset_engine() -> None:
 
 
 def create_db_and_tables() -> None:
+    from app.models.blueprint import BlueprintOptionSet, BlueprintRequest, BlueprintResult  # noqa: F401
     from app.models.agent import Agent  # noqa: F401
     from app.models.analytics import AnalyticsEvent  # noqa: F401
     from app.models.chat import ChatMessage, ChatSession  # noqa: F401
+    from app.models.industry import IndustryPack  # noqa: F401
     from app.models.lead import Lead  # noqa: F401
+    from app.models.use_case import UseCase  # noqa: F401
 
     Base.metadata.create_all(bind=get_engine())
 

@@ -1,5 +1,8 @@
 import type { BlueprintFormInput, BlueprintResult, ScoreCategory, AIOpportunity } from '@/types/blueprint';
 
+// Legacy mock fallback retained for offline experimentation only.
+// The homepage Blueprint flow now uses backend APIs as the primary path.
+
 // Generate readiness score based on form input
 export function computeReadinessScore(form: BlueprintFormInput): number {
   let score = 35;

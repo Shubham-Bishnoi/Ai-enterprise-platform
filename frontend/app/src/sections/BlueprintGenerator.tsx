@@ -1,18 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, ChevronRight, Sparkles, AlertCircle, Check } from 'lucide-react';
-import type { BlueprintFormInput } from '@/types/blueprint';
+import { FALLBACK_BLUEPRINT_OPTIONS, getBlueprintOptions, trackBlueprintEvent } from '@/lib/api/blueprintApi';
 import { BlueprintModal } from '@/components/modals/BlueprintModal';
 import { cn } from '@/lib/utils';
-
-const industries = ['Healthcare', 'Banking', 'Insurance', 'Manufacturing', 'Retail', 'Energy', 'Public Sector', 'Education', 'Telecom', 'Life Sciences'];
-const companySizes = ['Startup', 'SMB', 'Enterprise', 'Large Enterprise'];
-const aiJourneyStages = ['Just Starting', 'Exploring', 'Piloting', 'Scaling', 'Transforming'];
-const topPrioritiesList = ['Cost Reduction', 'Revenue Growth', 'Customer Experience', 'Operational Efficiency', 'Risk Management', 'Innovation', 'Compliance', 'Talent'];
-const biggestChallenges = ['Data Quality', 'Talent Shortage', 'Integration', 'Governance', 'ROI Uncertainty', 'Change Management', 'Budget Constraints', 'Technical Debt'];
-const dataReadinessOptions = ['Low', 'Moderate', 'High'];
-const leadershipCommitmentOptions = ['Exploring', 'Committed', 'Fully Committed'];
-const existingSystemsList = ['SAP', 'Salesforce', 'ServiceNow', 'Microsoft', 'Oracle', 'Custom Legacy', 'Data Lake/Warehouse', 'No Unified Platform'];
+import type { BlueprintFormInput, BlueprintFormOptions } from '@/types/blueprint';
 
 interface SelectorField {
   key: keyof BlueprintFormInput;
@@ -34,13 +26,44 @@ export default function BlueprintGenerator() {
     dataReadiness: '',
     existingSystems: [],
     leadershipCommitment: '',
+    riskAppetite: '',
   });
 
+  const [formOptions, setFormOptions] = useState<BlueprintFormOptions>(FALLBACK_BLUEPRINT_OPTIONS);
+  const [optionsError, setOptionsError] = useState<string | null>(null);
   const [activeSelector, setActiveSelector] = useState<SelectorField['key'] | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof BlueprintFormInput, string>>>({});
   const activeSelectorRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadOptions = async () => {
+      try {
+        const options = await getBlueprintOptions();
+        if (cancelled) return;
+        setFormOptions(options);
+        setOptionsError(null);
+        void trackBlueprintEvent({
+          eventName: 'blueprint_options_loaded',
+          source: 'homepage_blueprint_frontend',
+          payload: { source: 'frontend' },
+        });
+      } catch {
+        if (cancelled) return;
+        setFormOptions(FALLBACK_BLUEPRINT_OPTIONS);
+        setOptionsError('Unable to load live Blueprint options. Using fallback options for now.');
+      }
+    };
+
+    void loadOptions();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!activeSelector) return;
@@ -66,19 +89,20 @@ export default function BlueprintGenerator() {
   }, [activeSelector]);
 
   const selectors: SelectorField[] = useMemo(() => [
-    { key: 'industry', label: 'Industry', options: industries, multi: false, required: true },
-    { key: 'companySize', label: 'Company Size', options: companySizes, multi: false, required: true },
-    { key: 'topPriorities', label: 'Top Priorities (up to 3)', options: topPrioritiesList, multi: true, required: true },
-    { key: 'aiJourneyStage', label: 'AI Journey Stage', options: aiJourneyStages, multi: false, required: true },
-    { key: 'biggestChallenge', label: 'Biggest Challenge', options: biggestChallenges, multi: false, required: true },
+    { key: 'industry', label: 'Industry', options: formOptions.industries, multi: false, required: true },
+    { key: 'companySize', label: 'Company Size', options: formOptions.companySizes, multi: false, required: true },
+    { key: 'topPriorities', label: 'Top Priorities (up to 3)', options: formOptions.topPriorities, multi: true, required: true },
+    { key: 'aiJourneyStage', label: 'AI Journey Stage', options: formOptions.aiJourneyStages, multi: false, required: true },
+    { key: 'biggestChallenge', label: 'Biggest Challenge', options: formOptions.biggestChallenges, multi: false, required: true },
     { key: 'email', label: 'Business Email', options: [], multi: false, required: true },
-  ], []);
+  ], [formOptions]);
 
   const advancedSelectors: SelectorField[] = useMemo(() => [
-    { key: 'dataReadiness', label: 'Data Readiness', options: dataReadinessOptions, multi: false, required: false, advanced: true },
-    { key: 'existingSystems', label: 'Existing Systems', options: existingSystemsList, multi: true, required: false, advanced: true },
-    { key: 'leadershipCommitment', label: 'Leadership Commitment', options: leadershipCommitmentOptions, multi: false, required: false, advanced: true },
-  ], []);
+    { key: 'dataReadiness', label: 'Data Readiness', options: formOptions.dataReadiness, multi: false, required: false, advanced: true },
+    { key: 'existingSystems', label: 'Existing Systems', options: formOptions.existingSystems, multi: true, required: false, advanced: true },
+    { key: 'leadershipCommitment', label: 'Leadership Commitment', options: formOptions.leadershipCommitment, multi: false, required: false, advanced: true },
+    { key: 'riskAppetite', label: 'Risk Appetite', options: formOptions.riskAppetite, multi: false, required: false, advanced: true },
+  ], [formOptions]);
 
   const setSingle = (key: keyof BlueprintFormInput, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -314,6 +338,12 @@ export default function BlueprintGenerator() {
           }}
         >
           {/* Progress indicator */}
+          {optionsError && (
+            <div className="mb-5 rounded-2xl border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3 text-sm text-[color:var(--text-secondary)]">
+              {optionsError}
+            </div>
+          )}
+
           <div className="mb-8 w-full overflow-x-auto rounded-2xl border border-[color:var(--border-default)] bg-[var(--chip-bg)] px-4 py-4 lg:overflow-hidden lg:px-5">
             <div className="grid min-w-[760px] grid-cols-[auto_minmax(14px,1fr)_auto_minmax(14px,1fr)_auto_minmax(14px,1fr)_auto_minmax(14px,1fr)_auto_minmax(14px,1fr)_auto] items-center gap-2 lg:min-w-0">
               {requiredSelectors.map((selector, i) => {
@@ -398,6 +428,7 @@ export default function BlueprintGenerator() {
             onClick={handleGenerate}
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
+            disabled={showModal}
             className="mt-8 flex h-14 w-full items-center justify-center gap-3 rounded-2xl text-base font-semibold text-white shadow-lg shadow-blue-500/20 transition-all duration-500 hover:scale-[1.01] hover:shadow-blue-500/30 md:text-lg"
             style={{ backgroundImage: 'linear-gradient(90deg, #9A0003, #C03C85, #6B5BFF, #1173BC)' }}
           >
