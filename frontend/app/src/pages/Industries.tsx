@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Landmark, Shield, Heart, FlaskConical as Flask, Factory, ShoppingCart, GraduationCap, Building2, Pickaxe, Zap, Wifi, FileSearch, Calculator, Scale, Search, LayoutGrid
@@ -6,6 +6,8 @@ import {
 import { PageHero } from '@/components/shared/PageHero';
 import { GradientText } from '@/components/shared/GradientText';
 import { CTAButton } from '@/components/shared/CTAButton';
+import { trackAnalyticsEvent } from '@/lib/api/analyticsApi';
+import { fetchIndustries } from '@/lib/api/industriesApi';
 import { siteContainerClass } from '@/lib/siteContent';
 
 const industries = [
@@ -28,8 +30,56 @@ const industries = [
 export default function Industries() {
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(0);
+  const [industriesData, setIndustriesData] = useState(industries);
 
-  const filtered = industries.filter((ind) =>
+  const iconMap = useMemo(() => {
+    return {
+      Landmark,
+      Shield,
+      Heart,
+      FlaskConical: Flask,
+      Factory,
+      ShoppingCart,
+      GraduationCap,
+      Building2,
+      Pickaxe,
+      Zap,
+      Wifi,
+      FileSearch,
+      Calculator,
+      Scale,
+    } as const;
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    fetchIndustries()
+      .then((items) => {
+        if (!mounted) return;
+        if (!items || items.length === 0) return;
+        setIndustriesData(
+          items.map((ind) => {
+            const ui = (ind.ui || {}) as Record<string, any>;
+            const Icon = (iconMap as Record<string, any>)[ui.icon || ''] || Landmark;
+            const id = ui.slug || ind.slug;
+            return {
+              id,
+              name: ind.name,
+              icon: Icon,
+              color: ui.color || '#1173BC',
+              challenges: (ui.challenges || ind.common_challenges || []).slice(0, 3),
+              outcomes: (ui.outcomes || ind.business_outcomes || []).slice(0, 3),
+            };
+          }),
+        );
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, [iconMap]);
+
+  const filtered = industriesData.filter((ind) =>
     ind.name.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -72,7 +122,15 @@ export default function Industries() {
                 {filtered.map((ind, index) => (
                   <button
                     key={ind.id}
-                    onClick={() => setSelected(index)}
+                    onClick={() => {
+                      setSelected(index);
+                      trackAnalyticsEvent({
+                        eventName: 'content_clicked',
+                        source: 'industries_page',
+                        component: 'Industries',
+                        payload: { slug: ind.id, title: ind.name },
+                      });
+                    }}
                     className="flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all duration-300"
                     style={{
                       borderColor: selected === index && active?.id === ind.id ? `${ind.color}35` : 'transparent',

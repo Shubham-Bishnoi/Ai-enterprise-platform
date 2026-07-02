@@ -1,6 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search, Sparkles, Command, ArrowRight, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router';
+import { trackAnalyticsEvent } from '@/lib/api/analyticsApi';
+import { fetchSearchIndex, search as searchBackend, type SearchResult } from '@/lib/api/searchApi';
 import { quickSearchChips, quickSearchResults, siteContainerClass } from '@/lib/siteContent';
 
 function includesQuery(value: string, query: string) {
@@ -8,18 +11,104 @@ function includesQuery(value: string, query: string) {
 }
 
 export default function QuickSearch() {
+  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
+  const [remoteChips, setRemoteChips] = useState<string[] | null>(null);
+  const [remoteDefaultResults, setRemoteDefaultResults] = useState<SearchResult[] | null>(null);
+  const [remoteResults, setRemoteResults] = useState<SearchResult[] | null>(null);
+  const debounceRef = useRef<number | null>(null);
+  const lastTrackedQuery = useRef<string>('');
+
+  useEffect(() => {
+    let mounted = true;
+    fetchSearchIndex()
+      .then((data) => {
+        if (!mounted) return;
+        setRemoteChips(data.chips || []);
+        setRemoteDefaultResults(
+          (data.featured || []).map((entry) => ({
+            title: entry.title,
+            category: entry.category,
+            description: entry.description,
+            link: entry.link,
+            tags: entry.tags || [],
+            source_type: entry.source_type,
+            relevance_score: 1,
+          })),
+        );
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setRemoteChips(null);
+        setRemoteDefaultResults(null);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const trimmed = query.trim();
+    if (debounceRef.current) window.clearTimeout(debounceRef.current);
+
+    if (!trimmed) {
+      setRemoteResults(null);
+      return;
+    }
+
+    debounceRef.current = window.setTimeout(() => {
+      searchBackend(trimmed)
+        .then((data) => {
+          setRemoteResults(data.results || []);
+          if (lastTrackedQuery.current !== trimmed) {
+            lastTrackedQuery.current = trimmed;
+            trackAnalyticsEvent({
+              eventName: 'search_performed',
+              source: 'quick_search',
+              component: 'QuickSearch',
+              payload: { query: trimmed, total: data.total },
+            });
+          }
+        })
+        .catch(() => {
+          setRemoteResults(null);
+        });
+    }, 250);
+  }, [query, remoteDefaultResults, remoteResults]);
 
   const filteredResults = useMemo(() => {
     const trimmed = query.trim();
-    if (!trimmed) return quickSearchResults.slice(0, 6);
-    return quickSearchResults.filter((item) =>
-      includesQuery(item.title, trimmed) ||
-      includesQuery(item.category, trimmed) ||
-      includesQuery(item.description, trimmed) ||
-      item.tags.some((tag) => includesQuery(tag, trimmed))
-    );
+    if (!trimmed) {
+      const fallback = quickSearchResults.slice(0, 6);
+      const remoteFallback = (remoteDefaultResults || []).slice(0, 6).map((item) => ({
+        title: item.title,
+        category: item.category,
+        description: item.description,
+        link: item.link,
+        tags: item.tags || [],
+      }));
+      return remoteFallback.length > 0 ? remoteFallback : fallback;
+    }
+
+    if (remoteResults && remoteResults.length > 0) {
+      return remoteResults.map((item) => ({
+        title: item.title,
+        category: item.category,
+        description: item.description,
+        link: item.link,
+        tags: item.tags || [],
+      }));
+    }
+
+    return quickSearchResults.filter((item) => {
+      return (
+        includesQuery(item.title, trimmed) ||
+        includesQuery(item.category, trimmed) ||
+        includesQuery(item.description, trimmed) ||
+        item.tags.some((tag) => includesQuery(tag, trimmed))
+      );
+    });
   }, [query]);
 
   const groupedResults = useMemo(() => {
@@ -30,6 +119,8 @@ export default function QuickSearch() {
     });
     return groups;
   }, [filteredResults]);
+
+  const chips = remoteChips && remoteChips.length > 0 ? remoteChips : quickSearchChips;
 
   return (
     <section id="quick-search" className="relative overflow-hidden py-20 lg:py-24">
@@ -136,7 +227,7 @@ export default function QuickSearch() {
 
               {/* Chips */}
               <div className="mt-5 flex flex-wrap justify-center gap-2">
-                {quickSearchChips.map((chip) => (
+                {chips.map((chip) => (
                   <button
                     key={chip}
                     type="button"
@@ -196,6 +287,15 @@ export default function QuickSearch() {
                               style={{
                                 backgroundColor: 'var(--bg-glass)',
                                 borderColor: 'var(--border-default)',
+                              }}
+                              onClick={() => {
+                                trackAnalyticsEvent({
+                                  eventName: 'search_result_clicked',
+                                  source: 'quick_search',
+                                  component: 'QuickSearch',
+                                  payload: { query: query.trim(), title: item.title, link: item.link, category: item.category },
+                                });
+                                navigate(item.link);
                               }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.borderColor = 'var(--border-hover)';

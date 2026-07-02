@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Play, Sparkles, FileText, MessageSquare } from 'lucide-react';
+import { trackAnalyticsEvent } from '@/lib/api/analyticsApi';
 
 export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -122,7 +123,15 @@ export default function Hero() {
                   className="mt-8 flex max-w-full flex-wrap items-center gap-3 overflow-visible lg:flex-nowrap lg:gap-2.5 xl:gap-3"
                 >
                   <button
-                    onClick={() => document.querySelector('#blueprint')?.scrollIntoView({ behavior: 'smooth' })}
+                    onClick={() => {
+                      void trackAnalyticsEvent({
+                        eventName: 'hero_generate_blueprint_clicked',
+                        source: 'hero',
+                        component: 'Hero',
+                        payload: { target: '#blueprint' },
+                      });
+                      document.querySelector('#blueprint')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
                     className="group flex h-11 w-full max-w-full shrink-0 items-center justify-center gap-2 rounded-2xl bg-gff-gradient px-4 text-[13px] text-white transition-all duration-300 hover-gff-glow sheen-btn sm:w-auto sm:justify-start lg:w-auto lg:px-4 xl:px-5 xl:text-sm"
                   >
                     <FileText className="h-4 w-4" />
@@ -130,7 +139,15 @@ export default function Hero() {
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </button>
                   <button
-                    onClick={() => document.querySelector('#interactive-experience')?.scrollIntoView({ behavior: 'smooth' })}
+                    onClick={() => {
+                      void trackAnalyticsEvent({
+                        eventName: 'navigation_clicked',
+                        source: 'hero',
+                        component: 'Hero',
+                        payload: { target: '#interactive-experience' },
+                      });
+                      document.querySelector('#interactive-experience')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
                     className="group flex h-11 w-full max-w-full shrink-0 items-center justify-center gap-2 rounded-2xl px-4 text-[13px] text-white transition-all duration-300 btn-secondary sm:w-auto sm:justify-start lg:w-auto lg:px-4 xl:px-5 xl:text-sm"
                   >
                     <Play className="h-4 w-4" />
@@ -138,6 +155,12 @@ export default function Hero() {
                   </button>
                   <button
                     onClick={() => {
+                      void trackAnalyticsEvent({
+                        eventName: 'hero_talk_to_agent_clicked',
+                        source: 'hero',
+                        component: 'Hero',
+                        payload: { target: 'talk-to-agent-trigger' },
+                      });
                       const el = document.getElementById('talk-to-agent-trigger');
                       if (el) el.click();
                     }}

@@ -10,8 +10,21 @@ from app.core.logging import configure_logging
 from app.db.session import create_db_and_tables, get_session_factory
 from app.seed.seed_blueprint_taxonomy import seed_blueprint_taxonomy
 from app.seed.seed_agents import seed_agents
+from app.seed.seed_capabilities import seed_capabilities
+from app.seed.seed_content import seed_content
+from app.seed.seed_dashboard import seed_dashboard
 from app.seed.seed_industries import seed_industries
+from app.seed.seed_industries_content import seed_industries_content
+from app.seed.seed_homepage import seed_homepage
+from app.seed.seed_platforms import seed_platforms
+from app.seed.seed_resources import seed_resources
+from app.seed.seed_search import seed_search
 from app.seed.seed_use_cases import seed_use_cases
+from app.seed.seed_portal_demo import seed_portal_demo
+from app.seed.seed_portal_projects import seed_portal_projects
+from app.seed.seed_documents import seed_documents
+from app.seed.seed_governance import seed_governance
+from app.seed.seed_portal_activity import seed_portal_activity
 
 
 @asynccontextmanager
@@ -22,6 +35,19 @@ async def lifespan(_: FastAPI):
         seed_blueprint_taxonomy(db)
         seed_industries(db)
         seed_use_cases(db)
+        seed_content(db)
+        seed_homepage(db)
+        seed_capabilities(db)
+        seed_platforms(db)
+        seed_resources(db)
+        seed_dashboard(db)
+        seed_industries_content(db)
+        seed_search(db)
+        seed_portal_demo(db)
+        seed_portal_projects(db)
+        seed_documents(db)
+        seed_governance(db)
+        seed_portal_activity(db)
     yield
 
 

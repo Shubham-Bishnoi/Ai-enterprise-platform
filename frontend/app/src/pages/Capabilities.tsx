@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router';
 import {
@@ -8,6 +8,8 @@ import {
 import { PageHero } from '@/components/shared/PageHero';
 import { GradientText } from '@/components/shared/GradientText';
 import { CTAButton } from '@/components/shared/CTAButton';
+import { trackAnalyticsEvent } from '@/lib/api/analyticsApi';
+import { fetchCapabilities } from '@/lib/api/capabilitiesApi';
 import { siteContainerClass } from '@/lib/siteContent';
 
 const capabilities = [
@@ -96,15 +98,58 @@ const capabilities = [
 export default function Capabilities() {
   const location = useLocation();
   const [activeCap, setActiveCap] = useState(0);
-  const active = capabilities[activeCap];
+  const [capabilitiesData, setCapabilitiesData] = useState(capabilities);
+
+  const iconMap = useMemo(() => {
+    return {
+      Target,
+      Wrench,
+      BrainCircuit,
+      Gavel,
+      Settings2,
+      FlaskConical,
+      Network,
+      ShieldCheck,
+    } as const;
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    fetchCapabilities()
+      .then((items) => {
+        if (!mounted) return;
+        if (!items || items.length === 0) return;
+        setCapabilitiesData(
+          items.map((cap) => {
+            const Icon = (iconMap as Record<string, any>)[cap.ui_icon || ''] || Target;
+            return {
+              id: cap.slug,
+              title: cap.title,
+              icon: Icon,
+              color: cap.ui_color || '#1173BC',
+              tagline: cap.tagline || '',
+              description: cap.description,
+              items: cap.items || [],
+              deliverables: cap.deliverables || [],
+            };
+          }),
+        );
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, [iconMap]);
+
+  const active = capabilitiesData[activeCap] || capabilitiesData[0];
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const requested = params.get('cap');
     if (!requested) return;
-    const index = capabilities.findIndex((cap) => cap.id === requested);
+    const index = capabilitiesData.findIndex((cap) => cap.id === requested);
     if (index >= 0) setActiveCap(index);
-  }, [location.search]);
+  }, [location.search, capabilitiesData]);
 
   return (
     <main className="overflow-x-hidden">
@@ -128,10 +173,18 @@ export default function Capabilities() {
             {/* Capability Rail */}
             <div className="space-y-2">
               <p className="mb-4 text-xs font-mono uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Select capability</p>
-              {capabilities.map((cap, index) => (
+              {capabilitiesData.map((cap, index) => (
                 <button
                   key={cap.id}
-                  onClick={() => setActiveCap(index)}
+                  onClick={() => {
+                    setActiveCap(index);
+                    trackAnalyticsEvent({
+                      eventName: 'content_clicked',
+                      source: 'capabilities_page',
+                      component: 'Capabilities',
+                      payload: { slug: cap.id, title: cap.title },
+                    });
+                  }}
                   className="flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all duration-300"
                   style={{
                     borderColor: activeCap === index ? `${cap.color}40` : 'transparent',
@@ -237,7 +290,7 @@ export default function Capabilities() {
           >
             <h3 className="font-display text-xl font-bold mb-8" style={{ color: 'var(--text-primary)' }}>From Strategy to Operated AI</h3>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              {capabilities.map((cap, i) => (
+              {capabilitiesData.map((cap, i) => (
                 <div key={cap.id} className="flex items-center gap-3">
                   <div
                     className="flex items-center gap-2 rounded-full border px-4 py-2"

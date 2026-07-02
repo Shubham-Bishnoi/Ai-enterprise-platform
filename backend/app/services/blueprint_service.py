@@ -18,6 +18,8 @@ from app.schemas.blueprint import (
     BlueprintRegenerateRequest,
     BlueprintResultEnvelope,
 )
+from app.schemas.handoff import HandoffRequestCreate
+from app.services.handoff_service import HandoffService
 from gff_ai.config import get_ai_settings
 from gff_ai.graphs.blueprint_graph import run_blueprint_graph
 from gff_ai.schemas.profile import BlueprintProfile
@@ -280,18 +282,45 @@ class BlueprintService:
 
     def export_placeholder(self, blueprint_id: str) -> BlueprintActionResponse:
         blueprint = self.retrieve(blueprint_id)
+        document_id = None
+        try:
+            from sqlalchemy import select
+
+            from app.models.portal import ClientWorkspace
+            from app.services.document_service import DocumentService
+            from app.services.pdf_export_service import PDFExportService
+
+            workspace = self.db.scalar(
+                select(ClientWorkspace).order_by(ClientWorkspace.updated_at.desc()).limit(1)
+            )
+            if workspace:
+                payload = PDFExportService().blueprint_report_payload(
+                    blueprint_id=blueprint_id,
+                    blueprint=blueprint.model_dump(mode="json"),
+                )
+                document_id = DocumentService(self.db).create_blueprint_export_placeholder(
+                    workspace_id=workspace.id,
+                    blueprint_id=blueprint_id,
+                    title="Blueprint Report",
+                    content=payload,
+                )
+        except Exception:
+            document_id = None
         self._capture_event(
             event_name="blueprint_export_requested",
             source=blueprint.input_profile.source,
             session_id=blueprint.input_profile.chat_session_id,
-            payload={"blueprint_id": blueprint_id},
+            payload={"blueprint_id": blueprint_id, "document_id": document_id},
         )
         self.db.commit()
         return BlueprintActionResponse(
             blueprint_id=blueprint_id,
             action="export",
-            status="placeholder",
-            message="PDF export is reserved for Phase 1.5 frontend integration.",
+            status="ready" if document_id else "placeholder",
+            message="Blueprint export created as a portal document record (HTML report foundation). PDF rendering remains TODO for production hardening."
+            if document_id
+            else "PDF export is reserved for Phase 1.5 frontend integration.",
+            document_id=document_id,
         )
 
     def email_placeholder(self, blueprint_id: str) -> BlueprintActionResponse:
@@ -312,6 +341,17 @@ class BlueprintService:
 
     def handoff(self, blueprint_id: str) -> BlueprintHandoffResponse:
         blueprint = self.retrieve(blueprint_id)
+        HandoffService(self.db).create_request(
+            HandoffRequestCreate(
+                handoff_type="blueprint_review",
+                email=blueprint.input_profile.email,
+                blueprint_result_id=blueprint_id,
+                source=blueprint.input_profile.source,
+                recommended_specialist="Blueprint Review Team",
+                summary=blueprint.handoff_summary.executive_summary,
+                context=blueprint.handoff_summary.model_dump(),
+            )
+        )
         self._capture_event(
             event_name="blueprint_handoff_requested",
             source=blueprint.input_profile.source,

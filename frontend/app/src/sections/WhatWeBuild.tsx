@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   BrainCircuit,
@@ -12,6 +13,8 @@ import {
   Hexagon,
 } from 'lucide-react';
 import { Link } from 'react-router';
+import { trackAnalyticsEvent } from '@/lib/api/analyticsApi';
+import { fetchCapabilities } from '@/lib/api/capabilitiesApi';
 import { homeWhatWeBuildCards, siteContainerClass } from '@/lib/siteContent';
 
 const iconMap = {
@@ -71,7 +74,36 @@ function hexWithAlpha(hex: string, alphaHex: string): string {
 }
 
 export default function WhatWeBuild() {
-  const linksByTitle = Object.fromEntries(homeWhatWeBuildCards.map((card) => [card.title, card.link]));
+  const [capabilitiesByTitle, setCapabilitiesByTitle] = useState<Record<string, { slug: string; description: string }> | null>(
+    null,
+  );
+
+  useEffect(() => {
+    let mounted = true;
+    fetchCapabilities()
+      .then((caps) => {
+        if (!mounted) return;
+        if (!caps || caps.length === 0) return;
+        const map: Record<string, { slug: string; description: string }> = {};
+        caps.forEach((cap) => {
+          map[cap.title] = { slug: cap.slug, description: cap.description };
+        });
+        setCapabilitiesByTitle(map);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const linksByTitle = useMemo(() => {
+    const links = Object.fromEntries(homeWhatWeBuildCards.map((card) => [card.title, card.link]));
+    if (!capabilitiesByTitle) return links;
+    Object.entries(capabilitiesByTitle).forEach(([title, cap]) => {
+      links[title] = `/capabilities?cap=${cap.slug}`;
+    });
+    return links;
+  }, [capabilitiesByTitle]);
   const modules = [
     { title: 'AI Strategy', index: '01' },
     { title: 'AI Engineering', index: '02' },
@@ -83,9 +115,10 @@ export default function WhatWeBuild() {
     { title: 'AI Operations', index: '08' },
   ].map((module) => {
     const card = homeWhatWeBuildCards.find((item) => item.title === module.title);
+    const backend = capabilitiesByTitle?.[module.title];
     return {
       ...module,
-      description: card?.description ?? '',
+      description: backend?.description ?? card?.description ?? '',
       link: (linksByTitle[module.title] as string | undefined) ?? '/capabilities',
       status: statusMap[module.title],
       outcome: outcomeMap[module.title],
@@ -163,7 +196,18 @@ export default function WhatWeBuild() {
                 transition={{ duration: 0.5, delay: index * 0.06 }}
                 className="relative"
               >
-                <Link to={module.link} className="group relative block h-full">
+                <Link
+                  to={module.link}
+                  className="group relative block h-full"
+                  onClick={() => {
+                    trackAnalyticsEvent({
+                      eventName: 'content_clicked',
+                      source: 'what_we_build',
+                      component: 'WhatWeBuild',
+                      payload: { title: module.title, link: module.link },
+                    });
+                  }}
+                >
                   <span
                     className="pointer-events-none absolute right-[-7px] top-1/2 hidden h-3 w-3 -translate-y-1/2 rounded-full border border-white/20 opacity-60 transition-opacity duration-500 group-hover:opacity-100 xl:block"
                     style={{

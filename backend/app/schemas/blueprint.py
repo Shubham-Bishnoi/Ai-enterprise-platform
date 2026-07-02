@@ -78,6 +78,7 @@ class BlueprintActionResponse(BaseModel):
     action: str
     status: str
     message: str
+    document_id: str | None = None
 
 
 class BlueprintHandoffResponse(BaseModel):

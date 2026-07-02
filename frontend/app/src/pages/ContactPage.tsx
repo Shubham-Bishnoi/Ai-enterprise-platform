@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useLocation } from 'react-router';
 import {
   Check, MessageSquare, Send, Lightbulb, Calendar, DollarSign, Wrench, Handshake,
   Radio, GraduationCap, TrendingUp, Mail, User, Building2, FileText
@@ -7,6 +8,8 @@ import {
 import { PageHero } from '@/components/shared/PageHero';
 import { GradientText } from '@/components/shared/GradientText';
 import { CTAButton } from '@/components/shared/CTAButton';
+import { trackAnalyticsEvent } from '@/lib/api/analyticsApi';
+import { submitContact } from '@/lib/api/contactApi';
 import { siteContainerClass } from '@/lib/siteContent';
 
 const contactOptions = [
@@ -21,9 +24,61 @@ const contactOptions = [
 ];
 
 export default function ContactPage() {
+  const location = useLocation();
   const [submitted, setSubmitted] = useState(false);
   const [selectedIntent, setSelectedIntent] = useState('');
   const [formData, setFormData] = useState({ name: '', company: '', email: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const hash = location.hash.replace('#', '');
+    if (!hash) return;
+    const matched = contactOptions.find((option) => option.id === hash);
+    if (matched) {
+      setSelectedIntent(matched.title);
+    }
+  }, [location.hash]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      await submitContact({
+        name: formData.name,
+        company: formData.company,
+        email: formData.email,
+        intent: selectedIntent,
+        message: formData.message,
+        source: 'contact_page',
+        metadata: {
+          selected_intent: selectedIntent || 'general',
+          page_path: '/contact',
+        },
+      });
+      void trackAnalyticsEvent({
+        eventName: 'contact_form_submitted',
+        source: 'contact_page',
+        component: 'ContactPage',
+        pagePath: '/contact',
+        payload: { intent: selectedIntent || 'general' },
+      });
+      setSubmitted(true);
+    } catch {
+      void trackAnalyticsEvent({
+        eventName: 'contact_form_failed',
+        source: 'contact_page',
+        component: 'ContactPage',
+        pagePath: '/contact',
+        payload: { intent: selectedIntent || 'general' },
+      });
+      setErrorMessage('Unable to submit your request right now. Please try again shortly.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <main className="overflow-x-hidden">
@@ -89,7 +144,7 @@ export default function ContactPage() {
               {!submitted ? (
                 <form
                   className="space-y-5"
-                  onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }}
+                  onSubmit={(e) => { void handleSubmit(e); }}
                 >
                   <div>
                     <div className="mb-4 flex items-center gap-2">
@@ -157,10 +212,16 @@ export default function ContactPage() {
                   </label>
 
                   <button type="submit"
+                    disabled={isSubmitting}
                     className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gff-gradient px-5 py-3.5 text-sm font-medium text-white sheen-btn hover-gff-glow">
                     <Send className="h-4 w-4" />
-                    Submit Inquiry
+                    {isSubmitting ? 'Submitting...' : 'Submit Inquiry'}
                   </button>
+                  {errorMessage && (
+                    <p className="text-sm" style={{ color: '#FF6B6B' }}>
+                      {errorMessage}
+                    </p>
+                  )}
                 </form>
               ) : (
                 <div className="flex min-h-[420px] flex-col items-center justify-center text-center">

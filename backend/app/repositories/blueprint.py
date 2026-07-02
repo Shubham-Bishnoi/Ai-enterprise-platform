@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.db.base import utcnow
 from app.models.blueprint import BlueprintOptionSet, BlueprintRequest, BlueprintResult
 from app.models.lead import Lead
 
@@ -37,8 +38,18 @@ class BlueprintRepository:
         stmt = select(Lead).where(Lead.email == email)
         lead = self.db.scalar(stmt)
         if lead:
+            lead.last_seen_at = utcnow()
             return lead
-        lead = Lead(email=email, source=source, status="blueprint_lead")
+        timestamp = utcnow()
+        lead = Lead(
+            email=email,
+            source=source,
+            status="blueprint_lead",
+            lifecycle_stage="lead",
+            metadata_json={"source": source},
+            first_seen_at=timestamp,
+            last_seen_at=timestamp,
+        )
         self.db.add(lead)
         self.db.flush()
         self.db.refresh(lead)

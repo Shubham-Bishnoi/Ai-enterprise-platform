@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   BookOpen, Radio, FileText, Briefcase, LayoutGrid, Video, Presentation, Calendar, Code, Download,
@@ -7,7 +7,20 @@ import {
 import { PageHero } from '@/components/shared/PageHero';
 import { GradientText } from '@/components/shared/GradientText';
 import { CTAButton } from '@/components/shared/CTAButton';
+import { trackAnalyticsEvent } from '@/lib/api/analyticsApi';
+import { fetchResources } from '@/lib/api/resourcesApi';
 import { siteContainerClass } from '@/lib/siteContent';
+import { useNavigate } from 'react-router';
+
+type ResourceCard = {
+  title: string;
+  type: string;
+  desc: string;
+  date: string;
+  readTime: string;
+  featured: boolean;
+  link?: string | null;
+};
 
 const resourceTypes = [
   { id: 'all', label: 'All', icon: Library },
@@ -23,7 +36,7 @@ const resourceTypes = [
   { id: 'downloads', label: 'Downloads', icon: Download },
 ];
 
-const resources = [
+const resources: ResourceCard[] = [
   { title: 'Agentic AI Operating Model', type: 'research', desc: 'How enterprises should organize agents, humans, controls, and AI operations.', date: '2024', readTime: '8 min', featured: true },
   { title: 'AI Governance for Enterprises', type: 'whitepapers', desc: 'Controls, audit trails, risk systems, and responsible AI practices for production AI.', date: '2024', readTime: '12 min', featured: false },
   { title: 'Building Enterprise Agent Factories', type: 'architecture', desc: 'A practical model for designing, testing, deploying, and operating AI agents.', date: '2024', readTime: '15 min', featured: true },
@@ -50,10 +63,38 @@ const typeColors: Record<string, string> = {
 };
 
 export default function Resources() {
+  const navigate = useNavigate();
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [backendResources, setBackendResources] = useState<ResourceCard[] | null>(null);
 
-  const filtered = resources.filter((r) => {
+  useEffect(() => {
+    let mounted = true;
+    fetchResources()
+      .then((items) => {
+        if (!mounted) return;
+        if (!items || items.length === 0) return;
+        setBackendResources(
+          items.map((r) => ({
+            title: r.title,
+            type: r.resource_type,
+            desc: r.description,
+            date: r.published_at || '2024',
+            readTime: r.read_time || '5 min',
+            featured: r.featured,
+            link: r.link || null,
+          })),
+        );
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const allResources = backendResources && backendResources.length > 0 ? backendResources : resources;
+
+  const filtered = allResources.filter((r) => {
     const matchesType = filter === 'all' || r.type === filter;
     const matchesSearch = r.title.toLowerCase().includes(search.toLowerCase()) || r.desc.toLowerCase().includes(search.toLowerCase());
     return matchesType && matchesSearch;
@@ -138,7 +179,19 @@ export default function Resources() {
                     </div>
                     <h4 className="font-display text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{r.title}</h4>
                     <p className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>{r.desc}</p>
-                    <button className="mt-4 flex items-center gap-2 text-sm font-medium" style={{ color: typeColors[r.type] }}>
+                    <button
+                      className="mt-4 flex items-center gap-2 text-sm font-medium"
+                      style={{ color: typeColors[r.type] }}
+                      onClick={() => {
+                        void trackAnalyticsEvent({
+                          eventName: 'resource_clicked',
+                          source: 'resources_page',
+                          component: 'ResourcesFeaturedCard',
+                          payload: { title: r.title, type: r.type, link: r.link || null },
+                        });
+                        if (r.link) navigate(r.link);
+                      }}
+                    >
                       Read <ArrowRight className="h-4 w-4" />
                     </button>
                   </motion.div>
@@ -158,6 +211,15 @@ export default function Resources() {
                 transition={{ delay: i * 0.05 }}
                 className="rounded-[20px] border p-5 transition-all duration-300 hover:border-[var(--border-hover)]"
                 style={{ backgroundColor: 'var(--bg-glass)', borderColor: 'var(--border-default)' }}
+                onClick={() => {
+                  void trackAnalyticsEvent({
+                    eventName: 'resource_clicked',
+                    source: 'resources_page',
+                    component: 'ResourcesCard',
+                    payload: { title: r.title, type: r.type, link: r.link || null },
+                  });
+                  if (r.link) navigate(r.link);
+                }}
               >
                 <div className="flex items-center justify-between mb-3">
                   <span

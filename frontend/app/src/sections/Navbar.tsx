@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 import { Link, NavLink, useLocation } from 'react-router';
+import { trackAnalyticsEvent } from '@/lib/api/analyticsApi';
 import { useTheme } from '../context/ThemeContext';
 import { primaryNavItems } from '../lib/siteContent';
 
@@ -32,6 +33,23 @@ export default function Navbar() {
     ? 'bg-[var(--bg-primary)]/70 backdrop-blur-2xl border-b border-[var(--border-default)]'
     : 'bg-transparent';
 
+  const trackNavClick = (label: string, to: string) => {
+    void trackAnalyticsEvent({
+      eventName: 'navigation_clicked',
+      source: 'navbar',
+      component: 'Navbar',
+      payload: { label, to },
+    });
+    if (label.toLowerCase().includes('consultation')) {
+      void trackAnalyticsEvent({
+        eventName: 'book_consultation_clicked',
+        source: 'navbar',
+        component: 'Navbar',
+        payload: { label, to },
+      });
+    }
+  };
+
   return (
     <>
       <motion.nav
@@ -54,6 +72,7 @@ export default function Navbar() {
               <Link
                 to="/"
                 onClick={() => {
+                  trackNavClick('Home', '/');
                   if (location.pathname === '/' && !location.hash) {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }
@@ -155,6 +174,7 @@ export default function Navbar() {
               >
                 <Link
                   to="/contact"
+                  onClick={() => trackNavClick('Book a Consultation', '/contact')}
                   className="rounded-2xl bg-gff-gradient px-4 py-2.5 text-[13px] font-medium text-white sheen-btn transition-all duration-300 hover-gff-glow whitespace-nowrap xl:px-5 xl:text-sm"
                 >
                   Book a Consultation
@@ -214,6 +234,7 @@ export default function Navbar() {
                   <NavLink
                     to={link.to}
                     end={link.end}
+                    onClick={() => trackNavClick(link.label, link.to)}
                     className={({ isActive }) =>
                       `text-2xl font-display transition-colors ${isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-primary)] hover-text-gradient'
                       }`
@@ -231,6 +252,7 @@ export default function Navbar() {
               >
                 <Link
                   to="/portal"
+                  onClick={() => trackNavClick('Client Login', '/portal')}
                   className="rounded-2xl border border-[var(--border-default)] bg-[var(--chip-bg)] px-8 py-3 transition-all duration-300"
                   style={{ color: 'var(--text-primary)' }}
                 >
@@ -238,6 +260,7 @@ export default function Navbar() {
                 </Link>
                 <Link
                   to="/contact"
+                  onClick={() => trackNavClick('Book a Consultation', '/contact')}
                   className="rounded-2xl bg-gff-gradient px-8 py-3 font-medium text-white hover-gff-glow transition-all"
                 >
                   Book a Consultation

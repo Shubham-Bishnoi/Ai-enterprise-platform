@@ -25,6 +25,9 @@ import {
   handoffBlueprint,
   trackBlueprintEvent,
 } from '@/lib/api/blueprintApi';
+import { trackAnalyticsEvent } from '@/lib/api/analyticsApi';
+import { bookConsultation } from '@/lib/api/consultationApi';
+import { createHandoffRequest } from '@/lib/api/handoffApi';
 import { cn } from '@/lib/utils';
 
 interface BlueprintModalProps {
@@ -156,6 +159,12 @@ export function BlueprintModal({ isOpen, onClose, formData }: BlueprintModalProp
     setActionMessage(null);
 
     if (actionKey === 'talk_to_agent') {
+      void trackAnalyticsEvent({
+        eventName: 'blueprint_next_action_clicked',
+        source: 'homepage_blueprint_frontend',
+        component: 'BlueprintModal',
+        payload: { blueprint_id: result.id, action_key: actionKey },
+      });
       void trackBlueprintEvent({
         eventName: 'blueprint_handoff_clicked',
         source: 'homepage_blueprint_frontend',
@@ -170,6 +179,12 @@ export function BlueprintModal({ isOpen, onClose, formData }: BlueprintModalProp
       setIsActionPending(true);
 
       if (actionKey === 'download_blueprint') {
+        void trackAnalyticsEvent({
+          eventName: 'blueprint_next_action_clicked',
+          source: 'homepage_blueprint_frontend',
+          component: 'BlueprintModal',
+          payload: { blueprint_id: result.id, action_key: actionKey },
+        });
         void trackBlueprintEvent({
           eventName: 'blueprint_export_clicked',
           source: 'homepage_blueprint_frontend',
@@ -181,6 +196,12 @@ export function BlueprintModal({ isOpen, onClose, formData }: BlueprintModalProp
       }
 
       if (actionKey === 'email_blueprint') {
+        void trackAnalyticsEvent({
+          eventName: 'blueprint_next_action_clicked',
+          source: 'homepage_blueprint_frontend',
+          component: 'BlueprintModal',
+          payload: { blueprint_id: result.id, action_key: actionKey },
+        });
         void trackBlueprintEvent({
           eventName: 'blueprint_email_clicked',
           source: 'homepage_blueprint_frontend',
@@ -191,6 +212,71 @@ export function BlueprintModal({ isOpen, onClose, formData }: BlueprintModalProp
         return;
       }
 
+      if (actionKey === 'book_workshop') {
+        void trackAnalyticsEvent({
+          eventName: 'blueprint_next_action_clicked',
+          source: 'homepage_blueprint_frontend',
+          component: 'BlueprintModal',
+          payload: { blueprint_id: result.id, action_key: actionKey },
+        });
+        const booking = await bookConsultation({
+          email: formData.email,
+          consultationType: 'executive_workshop',
+          source: 'blueprint_next_action',
+          notes: `Blueprint workshop request for ${formData.industry}.`,
+          metadata: {
+            blueprint_id: result.id,
+            company_size: formData.companySize,
+            ai_journey_stage: formData.aiJourneyStage,
+          },
+        });
+        void trackAnalyticsEvent({
+          eventName: 'workshop_requested',
+          source: 'homepage_blueprint_frontend',
+          component: 'BlueprintModal',
+          payload: { blueprint_id: result.id, booking_id: booking.bookingId },
+        });
+        setActionMessage('Workshop request received. Calendar integration will be configured later.');
+        return;
+      }
+
+      if (actionKey === 'request_proposal') {
+        void trackAnalyticsEvent({
+          eventName: 'blueprint_next_action_clicked',
+          source: 'homepage_blueprint_frontend',
+          component: 'BlueprintModal',
+          payload: { blueprint_id: result.id, action_key: actionKey },
+        });
+        const handoff = await createHandoffRequest({
+          handoffType: 'proposal',
+          email: formData.email,
+          blueprintResultId: result.id,
+          source: 'blueprint_next_action',
+          recommendedSpecialist: 'AI Architecture Team',
+          summary: `Blueprint proposal request for ${formData.industry}.`,
+          context: {
+            blueprint_id: result.id,
+            company_size: formData.companySize,
+            ai_journey_stage: formData.aiJourneyStage,
+            top_priorities: formData.topPriorities,
+          },
+        });
+        void trackAnalyticsEvent({
+          eventName: 'proposal_requested',
+          source: 'homepage_blueprint_frontend',
+          component: 'BlueprintModal',
+          payload: { blueprint_id: result.id, handoff_id: handoff.handoffId },
+        });
+        setActionMessage(handoff.nextStepMessage);
+        return;
+      }
+
+      void trackAnalyticsEvent({
+        eventName: 'blueprint_next_action_clicked',
+        source: 'homepage_blueprint_frontend',
+        component: 'BlueprintModal',
+        payload: { blueprint_id: result.id, action_key: actionKey },
+      });
       void trackBlueprintEvent({
         eventName: 'blueprint_handoff_clicked',
         source: 'homepage_blueprint_frontend',

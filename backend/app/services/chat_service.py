@@ -21,6 +21,8 @@ from app.schemas.chat import (
     SessionSnapshot,
     SuggestedQuestion,
 )
+from app.schemas.handoff import HandoffRequestCreate
+from app.services.handoff_service import HandoffService
 from gff_ai.agents.handoff import build_handoff_payload
 from gff_ai.graphs.discovery_graph import run_discovery_graph
 
@@ -243,6 +245,17 @@ class ChatService:
             source=session.source_surface,
             session_id=session.id,
             payload=handoff_payload.model_dump(),
+        )
+        handoff_type = "workshop" if payload.target == "workshop" else "human_expert"
+        HandoffService(self.db).create_request(
+            HandoffRequestCreate(
+                handoff_type=handoff_type,
+                chat_session_id=session.id,
+                source=session.source_surface,
+                recommended_specialist=handoff_payload.recommended_owner,
+                summary=handoff_payload.summary,
+                context=handoff_payload.model_dump(),
+            )
         )
         self.db.commit()
         return HandoffResponseData(

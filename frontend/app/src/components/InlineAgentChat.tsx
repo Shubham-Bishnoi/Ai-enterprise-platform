@@ -23,6 +23,7 @@ import {
   trackTalkToAgentEvent,
   triggerTalkToAgentQuickAction,
 } from '@/lib/api/talkToAgentApi';
+import { trackAnalyticsEvent } from '@/lib/api/analyticsApi';
 import { cn } from '@/lib/utils';
 import type {
   AgentRecommendation,
@@ -123,10 +124,23 @@ export function InlineAgentChat({ selectedAgent }: InlineAgentChatProps) {
   };
 
   const handleNextAction = async (action: NextStepAction) => {
+    void trackAnalyticsEvent({
+      eventName: 'talk_agent_next_action_clicked',
+      source: sourceSurface,
+      component: 'InlineAgentChat',
+      payload: { action_type: action.type, href: action.href || null },
+    });
+
     if (
       session &&
       (action.type === 'request_handoff' || action.type === 'book_workshop')
     ) {
+      void trackAnalyticsEvent({
+        eventName: action.type === 'book_workshop' ? 'workshop_requested' : 'handoff_requested',
+        source: sourceSurface,
+        component: 'InlineAgentChat',
+        payload: { session_id: session.id, action_type: action.type },
+      });
       void trackTalkToAgentEvent({
         eventName: 'talk_to_agent_handoff_requested',
         source: sourceSurface,

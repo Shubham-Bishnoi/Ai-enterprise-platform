@@ -8,9 +8,31 @@ from app.db.base import Base
 from app.models.blueprint import BlueprintOptionSet, BlueprintRequest, BlueprintResult  # noqa: F401
 from app.models.agent import Agent  # noqa: F401
 from app.models.analytics import AnalyticsEvent  # noqa: F401
+from app.models.capability import Capability  # noqa: F401
 from app.models.chat import ChatMessage, ChatSession  # noqa: F401
+from app.models.consultation import ConsultationBooking  # noqa: F401
+from app.models.content import ContentPage, HomeSection  # noqa: F401
+from app.models.contact import ContactRequest  # noqa: F401
+from app.models.dashboard import DashboardMetric  # noqa: F401
+from app.models.handoff import HandoffRequest  # noqa: F401
 from app.models.industry import IndustryPack  # noqa: F401
+from app.models.industry_content import IndustryContent  # noqa: F401
 from app.models.lead import Lead  # noqa: F401
+from app.models.platform import Platform  # noqa: F401
+from app.models.portal import (  # noqa: F401
+    AgentRun,
+    ClientWorkspace,
+    GovernanceAssessment,
+    GovernanceControl,
+    PortalActivity,
+    PortalDocument,
+    PortalProject,
+    ProjectMilestone,
+    SupportTicket,
+)
+from app.models.resource import Resource  # noqa: F401
+from app.models.search import SearchIndexEntry  # noqa: F401
+from app.models.user import User  # noqa: F401
 from app.models.use_case import UseCase  # noqa: F401
 
 config = context.config

@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, BookOpen, Clock, FileText, Library, Radio, Sparkles } from 'lucide-react';
 import { Link } from 'react-router';
 import { CTAButton } from '@/components/shared';
+import { trackAnalyticsEvent } from '@/lib/api/analyticsApi';
+import { fetchFeaturedResources } from '@/lib/api/resourcesApi';
 import { latestResearchItems, siteContainerClass } from '@/lib/siteContent';
 
 const typeIcons: Record<string, typeof Radio> = {
@@ -29,13 +31,48 @@ const readingTimes: Record<string, string> = {
 
 export default function LatestResearch() {
   const [activeFilter, setActiveFilter] = useState('All');
+  const [backendItems, setBackendItems] = useState<typeof latestResearchItems | null>(null);
 
-  const filtered = activeFilter === 'All'
-    ? latestResearchItems
-    : latestResearchItems.filter((item) => item.type === activeFilter);
+  useEffect(() => {
+    let mounted = true;
+    fetchFeaturedResources()
+      .then((resources) => {
+        if (!mounted) return;
+        const items = (resources || []).slice(0, 8).map((r) => {
+          const type =
+            r.resource_type === 'research'
+              ? 'Research'
+              : r.resource_type === 'whitepapers'
+                ? 'Whitepaper'
+                : r.resource_type === 'architecture'
+                  ? 'Architecture'
+                  : 'Article';
+          return {
+            title: r.title,
+            type,
+            description: r.description,
+            link: r.link || '/resources',
+          };
+        });
+        setBackendItems(items.length > 0 ? items : null);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setBackendItems(null);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const items = backendItems && backendItems.length > 0 ? backendItems : latestResearchItems;
+
+  const filtered = useMemo(() => {
+    return activeFilter === 'All' ? items : items.filter((item) => item.type === activeFilter);
+  }, [activeFilter, items]);
 
   // Featured = first item when showing all
-  const featured = activeFilter === 'All' ? latestResearchItems[0] : null;
+  const featured = activeFilter === 'All' ? items[0] : null;
   const gridItems = activeFilter === 'All' ? filtered.slice(1) : filtered;
 
   return (
@@ -133,7 +170,18 @@ export default function LatestResearch() {
                 transition={{ delay: 0.1 }}
                 className="mb-6"
               >
-                <Link to={featured.link} className="block">
+                <Link
+                  to={featured.link}
+                  className="block"
+                  onClick={() => {
+                    trackAnalyticsEvent({
+                      eventName: 'resource_clicked',
+                      source: 'latest_research',
+                      component: 'LatestResearch',
+                      payload: { title: featured.title, type: featured.type, link: featured.link, featured: true },
+                    });
+                  }}
+                >
                   <div
                     className="group relative overflow-hidden rounded-[28px] border transition-all duration-500 lg:grid lg:grid-cols-[1fr_0.6fr]"
                     style={{
@@ -217,7 +265,18 @@ export default function LatestResearch() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 + index * 0.06 }}
                   >
-                    <Link to={item.link} className="block h-full">
+                    <Link
+                      to={item.link}
+                      className="block h-full"
+                      onClick={() => {
+                        trackAnalyticsEvent({
+                          eventName: 'resource_clicked',
+                          source: 'latest_research',
+                          component: 'LatestResearch',
+                          payload: { title: item.title, type: item.type, link: item.link },
+                        });
+                      }}
+                    >
                       <div
                         className="group h-full overflow-hidden rounded-[24px] border p-6 transition-all duration-500"
                         style={{

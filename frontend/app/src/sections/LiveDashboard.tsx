@@ -1,5 +1,7 @@
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Activity, Dot, ShieldCheck, TrendingUp, Users, Cpu, Globe, Layers } from 'lucide-react';
+import { fetchDashboardActivity, fetchDashboardMetrics } from '@/lib/api/dashboardApi';
 import { liveDashboardMetrics, liveDashboardPanels, siteContainerClass } from '@/lib/siteContent';
 
 const metricIcons = [Users, Cpu, Layers, Globe, TrendingUp];
@@ -12,6 +14,44 @@ const activityFeed = [
 ];
 
 export default function LiveDashboard() {
+  const [metrics, setMetrics] = useState(liveDashboardMetrics);
+  const [activity, setActivity] = useState(activityFeed);
+
+  useEffect(() => {
+    let mounted = true;
+    fetchDashboardMetrics()
+      .then((items) => {
+        if (!mounted) return;
+        if (items && items.length > 0) {
+          setMetrics(items.map((m) => ({ label: m.label, value: m.value })));
+        }
+      })
+      .catch(() => {});
+
+    fetchDashboardActivity()
+      .then((data) => {
+        if (!mounted) return;
+        if (data.activity && data.activity.length > 0) {
+          setActivity(
+            data.activity.map((a) => ({
+              label: a.label,
+              time: a.time,
+              type: a.activity_type,
+            })),
+          );
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const icons = useMemo(() => {
+    return [Users, Cpu, Layers, Globe, TrendingUp];
+  }, []);
+
   return (
     <section id="live-dashboard" className="relative py-20 lg:py-28 overflow-hidden">
       <div
@@ -87,8 +127,8 @@ export default function LiveDashboard() {
 
             {/* Metrics Grid */}
             <div className="grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-5 lg:p-8">
-              {liveDashboardMetrics.map((metric, index) => {
-                const Icon = metricIcons[index];
+              {metrics.map((metric, index) => {
+                const Icon = icons[index] || metricIcons[index] || Users;
                 return (
                   <motion.div
                     key={metric.label}
@@ -170,7 +210,7 @@ export default function LiveDashboard() {
             >
               <h4 className="mb-4 text-sm font-medium" style={{ color: 'var(--text-tertiary)' }}>Recent Activity</h4>
               <div className="space-y-3">
-                {activityFeed.map((item, i) => (
+                {activity.map((item, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <div className="relative flex h-2 w-2 flex-shrink-0">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60" style={{ backgroundColor: i === 0 ? '#10B981' : 'transparent' }} />

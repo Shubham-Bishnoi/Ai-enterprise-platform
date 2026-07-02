@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 ROOT = Path(__file__).resolve().parents[3]
 BACKEND_PATH = ROOT / "backend"
-AI_PATH = ROOT / "AI"
+AI_PATH = ROOT / "ai"
 
 for path in (str(BACKEND_PATH), str(AI_PATH)):
     if path not in sys.path:

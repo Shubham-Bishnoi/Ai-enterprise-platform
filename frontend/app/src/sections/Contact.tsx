@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Send, ChevronDown, Check } from 'lucide-react';
+import { trackAnalyticsEvent } from '@/lib/api/analyticsApi';
+import { submitContact } from '@/lib/api/contactApi';
 
 const services = [
   'AI Strategy Consulting',
@@ -16,6 +18,8 @@ const services = [
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: '', company: '', email: '', phone: '', country: '', service: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Neural constellation canvas
@@ -96,9 +100,50 @@ export default function Contact() {
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      await submitContact({
+        name: form.name,
+        company: form.company,
+        email: form.email,
+        intent: 'general',
+        message: [
+          'Homepage contact request.',
+          form.service ? `Service interest: ${form.service}.` : null,
+          form.country ? `Country / Region: ${form.country}.` : null,
+          form.phone ? `Phone: ${form.phone}.` : null,
+        ]
+          .filter(Boolean)
+          .join(' '),
+        source: 'homepage_contact',
+        metadata: {
+          phone: form.phone,
+          country: form.country,
+          service_interest: form.service,
+        },
+      });
+      void trackAnalyticsEvent({
+        eventName: 'contact_form_submitted',
+        source: 'homepage_contact',
+        component: 'ContactSection',
+        payload: { service_interest: form.service || null },
+      });
+      setSubmitted(true);
+    } catch {
+      void trackAnalyticsEvent({
+        eventName: 'contact_form_failed',
+        source: 'homepage_contact',
+        component: 'ContactSection',
+        payload: { service_interest: form.service || null },
+      });
+      setErrorMessage('Unable to submit your request right now. Please try again shortly.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -150,7 +195,7 @@ export default function Contact() {
             className="lg:w-1/2"
           >
             {!submitted ? (
-              <form onSubmit={handleSubmit} className="glass-card rounded-2xl p-8">
+              <form onSubmit={(e) => { void handleSubmit(e); }} className="glass-card rounded-2xl p-8">
                 <h3 className="text-xl font-display font-bold text-[color:var(--text-primary)] mb-6">Get in Touch</h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
@@ -231,11 +276,17 @@ export default function Contact() {
 
                 <button
                   type="submit"
+                  disabled={isSubmitting}
                   className="w-full py-3.5 bg-gff-gradient text-white font-medium rounded-2xl sheen-btn hover-gff-glow transition-all flex items-center justify-center gap-2"
                 >
                   <Send className="w-4 h-4" />
-                  Send Message
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
                 </button>
+                {errorMessage && (
+                  <p className="mt-3 text-sm" style={{ color: '#FF6B6B' }}>
+                    {errorMessage}
+                  </p>
+                )}
               </form>
             ) : (
               <motion.div

@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     app_name: str = "GFF AI Backend"
     api_v1_prefix: str = "/api/v1"
     environment: str = "development"
-    debug: bool = True
+    debug: bool = False
     testing: bool = False
 
     database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/gff_ai"
@@ -23,6 +23,8 @@ class Settings(BaseSettings):
     nvidia_base_url: str = "https://integrate.api.nvidia.com/v1"
     blueprint_engine_version: str = "v1"
     blueprint_default_industry: str = "generic-enterprise"
+
+    secret_key: str = "dev-secret-change-me"
 
     backend_cors_origins: Annotated[list[str], NoDecode] = [
         "http://localhost:5173",

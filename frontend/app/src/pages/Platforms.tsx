@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FlaskConical, Hammer, Factory, FileText, LayoutGrid, Monitor, GraduationCap, University, ClipboardCheck, Gem, ShoppingBag, TowerControl, ArrowRight, Sparkles
@@ -6,6 +6,8 @@ import {
 import { PageHero } from '@/components/shared/PageHero';
 import { GradientText } from '@/components/shared/GradientText';
 import { CTAButton } from '@/components/shared/CTAButton';
+import { trackAnalyticsEvent } from '@/lib/api/analyticsApi';
+import { fetchPlatforms } from '@/lib/api/platformsApi';
 import { siteContainerClass } from '@/lib/siteContent';
 
 const platformGroups = [
@@ -51,8 +53,59 @@ export default function Platforms() {
   const [selectedGroup, setSelectedGroup] = useState(0);
   const [selectedPlatform, setSelectedPlatform] = useState(0);
 
-  const group = platformGroups[selectedGroup];
-  const platform = group.platforms[selectedPlatform];
+  const [groups, setGroups] = useState(platformGroups);
+
+  const iconMap = useMemo(() => {
+    return {
+      FlaskConical,
+      Hammer,
+      Factory,
+      FileText,
+      LayoutGrid,
+      Monitor,
+      Gem,
+      ShoppingBag,
+      TowerControl,
+      GraduationCap,
+      University,
+      ClipboardCheck,
+    } as const;
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    fetchPlatforms()
+      .then((items) => {
+        if (!mounted) return;
+        if (!items || items.length === 0) return;
+        const grouped: Record<string, { label: string; color: string; platforms: any[] }> = {};
+        items.forEach((p) => {
+          const meta = (p.metadata || {}) as Record<string, any>;
+          const groupLabel = meta.group || 'Platforms';
+          const groupColor = meta.group_color || p.ui_color || '#1173BC';
+          if (!grouped[groupLabel]) grouped[groupLabel] = { label: groupLabel, color: groupColor, platforms: [] };
+          const Icon = (iconMap as Record<string, any>)[p.ui_icon || ''] || FileText;
+          grouped[groupLabel].platforms.push({
+            id: p.slug,
+            name: p.name,
+            icon: Icon,
+            desc: p.description,
+            tags: p.tags || [],
+          });
+        });
+        const nextGroups = Object.values(grouped).sort((a, b) => a.label.localeCompare(b.label));
+        setGroups(nextGroups.length > 0 ? nextGroups : platformGroups);
+        setSelectedGroup(0);
+        setSelectedPlatform(0);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, [iconMap]);
+
+  const group = groups[selectedGroup] || groups[0];
+  const platform = group?.platforms?.[selectedPlatform] || group?.platforms?.[0];
 
   return (
     <main className="overflow-x-hidden">
@@ -73,7 +126,7 @@ export default function Platforms() {
         <div className={siteContainerClass}>
           {/* Group Tabs */}
           <div className="flex flex-wrap gap-2 mb-10">
-            {platformGroups.map((g, i) => (
+            {groups.map((g, i) => (
               <button
                 key={g.label}
                 onClick={() => { setSelectedGroup(i); setSelectedPlatform(0); }}
@@ -106,7 +159,15 @@ export default function Platforms() {
                   {group.platforms.map((p, i) => (
                     <button
                       key={p.id}
-                      onClick={() => setSelectedPlatform(i)}
+                      onClick={() => {
+                        setSelectedPlatform(i);
+                        trackAnalyticsEvent({
+                          eventName: 'content_clicked',
+                          source: 'platforms_page',
+                          component: 'Platforms',
+                          payload: { slug: p.id, title: p.name, group: group.label },
+                        });
+                      }}
                       className="rounded-[24px] border p-6 text-left transition-all duration-300"
                       style={{
                         backgroundColor: selectedPlatform === i ? `${group.color}08` : 'var(--bg-glass)',
