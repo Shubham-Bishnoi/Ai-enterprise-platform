@@ -6,6 +6,10 @@ frontend/gffai.zip
 gffenv/
 **/__pycache__/
 *.pyc
+.env
+.env.*
+!.env.example
+!.env.production.example
 backend/.env
 ai/.env
 AI/.env

@@ -3,5 +3,7 @@ def test_health_endpoint(client):
 
     assert response.status_code == 200
     payload = response.json()
-    assert payload["status"] == "ok"
-    assert payload["mock_ai_mode"] is True
+    assert payload["success"] is True
+    assert payload["error"] is None
+    assert payload["data"]["status"] == "ok"
+    assert payload["data"]["mock_ai_mode"] is True

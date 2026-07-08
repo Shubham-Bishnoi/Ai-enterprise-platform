@@ -13,11 +13,14 @@ class Settings(BaseSettings):
     testing: bool = False
 
     database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/gff_ai"
+    frontend_url: str | None = None
     enable_ai_mock_mode: bool = True
     ai_provider: str = "mock"
     openai_api_key: str | None = None
-    openai_model: str = "gpt-4o-mini"
-    openai_base_url: str | None = None
+    openai_model: str = "gpt-5.4-mini"
+    openai_router_model: str = "gpt-5.4-nano"
+    openai_blueprint_model: str = "gpt-5.4-mini"
+    openai_base_url: str | None = "https://api.openai.com/v1"
     nvidia_api_key: str | None = None
     nvidia_model: str = "meta/llama-3.1-8b-instruct"
     nvidia_base_url: str = "https://integrate.api.nvidia.com/v1"
@@ -25,14 +28,22 @@ class Settings(BaseSettings):
     blueprint_default_industry: str = "generic-enterprise"
 
     secret_key: str = "dev-secret-change-me"
+    redis_url: str | None = None
+    email_provider: str | None = None
+    resend_api_key: str | None = None
+    storage_provider: str | None = None
+    s3_bucket: str | None = None
+    cloudflare_r2_bucket: str | None = None
 
     backend_cors_origins: Annotated[list[str], NoDecode] = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
     ]
 
     model_config = SettingsConfigDict(
-        env_file=(".env", "backend/.env"),
+        env_file=(".env", "backend/.env", "ai/.env", "AI/.env"),
         env_file_encoding="utf-8",
         extra="ignore",
         case_sensitive=False,
@@ -40,7 +51,7 @@ class Settings(BaseSettings):
 
     @field_validator("backend_cors_origins", mode="before")
     @classmethod
-    def parse_cors_origins(cls, value: str | list[str]) -> list[str]:
+    def parse_cors_origins(cls, value: object) -> list[str]:
         if isinstance(value, list):
             return value
         if isinstance(value, str):

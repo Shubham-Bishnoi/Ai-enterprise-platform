@@ -14,7 +14,15 @@ _session_factory: sessionmaker[Session] | None = None
 def _engine_kwargs(database_url: str) -> dict:
     if database_url.startswith("sqlite"):
         return {"connect_args": {"check_same_thread": False}}
-    return {"pool_pre_ping": True}
+
+    kwargs = {"pool_pre_ping": True}
+
+    # Supabase transaction poolers sit behind PgBouncer and are not compatible
+    # with psycopg prepared statements during metadata checks/startup.
+    if "pooler.supabase.com" in database_url:
+        kwargs["connect_args"] = {"prepare_threshold": None}
+
+    return kwargs
 
 
 def get_engine() -> Engine:

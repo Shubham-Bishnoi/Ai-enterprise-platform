@@ -1,0 +1,58 @@
+services:
+  - type: web
+    name: gff-ai-backend
+    runtime: docker
+    plan: free
+    rootDir: .
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: API_V1_PREFIX
+        value: /api/v1
+      - key: AI_PROVIDER
+        value: openai
+      - key: ENABLE_AI_MOCK_MODE
+        value: "false"
+      - key: OPENAI_BASE_URL
+        value: https://api.openai.com/v1
+      - key: OPENAI_MODEL
+        value: gpt-5.4-mini
+      - key: OPENAI_ROUTER_MODEL
+        value: gpt-5.4-nano
+      - key: OPENAI_BLUEPRINT_MODEL
+        value: gpt-5.4-mini
+      - key: BLUEPRINT_ENGINE_VERSION
+        value: v1
+      - key: BLUEPRINT_DEFAULT_INDUSTRY
+        value: generic-enterprise
+      - key: DATABASE_URL
+        sync: false
+      - key: BACKEND_CORS_ORIGINS
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: GFF_PORTAL_JWT_SECRET
+        sync: false
+      - key: GFF_PORTAL_DEMO_PASSWORD
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: EMAIL_PROVIDER
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: STORAGE_PROVIDER
+        sync: false
+      - key: S3_BUCKET
+        sync: false
+      - key: CLOUDFLARE_R2_BUCKET
+        sync: false
