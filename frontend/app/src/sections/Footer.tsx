@@ -119,23 +119,29 @@ export default function Footer() {
           <div className="flex items-start gap-3">
             <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0" style={{ color: 'var(--gff-blue)' }} />
             <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              71 Pennington Lane<br />Vernon Rockville, CT 06066
+              68 Circular Road, #02-01,<br />Singapore- 049422, Singapore
             </span>
           </div>
           <div className="flex items-center gap-3">
             <Mail className="h-4 w-4 flex-shrink-0" style={{ color: 'var(--gff-blue)' }} />
-            <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>thefactoryai@gmail.com</span>
+            <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>hello@gffai.ai</span>
           </div>
           <div className="flex items-center gap-3">
             <Phone className="h-4 w-4 flex-shrink-0" style={{ color: 'var(--gff-blue)' }} />
-            <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>+91-755-507-8740</span>
+            <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>+65-93239991</span>
           </div>
         </motion.div>
 
         {/* Copyright */}
-        <div className="pt-8 border-t text-center" style={{ borderColor: 'var(--border-default)' }}>
-          <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-            &copy; {new Date().getFullYear()} GFF AI. All Rights Reserved. Garage | Foundry | Factory.
+        <div className="border-t pt-8 text-center" style={{ borderColor: 'var(--border-default)' }}>
+          <p className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+            &copy; 2026 GFF AI PTE. LTD. All Rights Reserved.
+          </p>
+          <p className="mx-auto mt-3 max-w-5xl text-[11px] leading-6 sm:text-xs" style={{ color: 'var(--text-secondary)' }}>
+            The information on this website is provided for general informational purposes only. Product features, demonstrations, use
+            cases, and roadmap items are illustrative and subject to change without notice. All intellectual property, including
+            trademarks, content, methodologies, software, and designs, is the exclusive property of GFF AI PTE. LTD. Unauthorized
+            use, reproduction, or distribution is prohibited. Third-party trademarks remain the property of their respective owners.
           </p>
         </div>
       </div>

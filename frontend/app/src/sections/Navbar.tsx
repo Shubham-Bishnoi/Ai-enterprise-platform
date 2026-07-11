@@ -63,10 +63,10 @@ export default function Navbar() {
         } : {}}
       >
         <div className="mx-auto max-w-[1740px] px-6 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
-          <div className="flex items-center justify-between h-16 lg:h-20">
+          <div className="flex h-16 items-center justify-between xl:h-20">
             {/* Logo */}
             <motion.div
-              className="flex items-center gap-2 group flex-shrink-0"
+              className="group flex flex-shrink-0 items-center gap-2"
               whileHover={{ scale: 1.02 }}
             >
               <Link
@@ -77,40 +77,34 @@ export default function Navbar() {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }
                 }}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2.5 xl:gap-3"
               >
-                <div className="relative w-9 h-9 flex items-center justify-center flex-shrink-0">
-                  <svg viewBox="0 0 40 40" className="w-full h-full">
-                    <defs>
-                      <linearGradient id="logoGrad" x1="0%" y1="50%" x2="100%" y2="50%">
-                        <stop offset="0%" stopColor="#9A0003" />
-                        <stop offset="15%" stopColor="#FF3040" />
-                        <stop offset="40%" stopColor="#C03C85" />
-                        <stop offset="70%" stopColor="#6B5BFF" />
-                        <stop offset="100%" stopColor="#1173BC" />
-                      </linearGradient>
-                    </defs>
-                    <polygon points="20,2 36,12 36,28 20,38 4,28 4,12" fill="none" stroke="url(#logoGrad)" strokeWidth="2.5" />
-                    <polygon points="20,8 30,14 30,26 20,32 10,26 10,14" fill="url(#logoGrad)" opacity="0.15" />
-                    <path d="M16 28 L16 16 L20 12 L24 16 L24 20 L20 24 L20 28" fill="none" stroke="url(#logoGrad)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-display font-bold text-lg leading-none tracking-tight" style={{ color: lightOnHero ? '#ffffff' : 'var(--text-primary)' }}>GFF AI</span>
-                  <span className="text-[10px] tracking-[0.2em] uppercase leading-none mt-0.5" style={{ color: lightOnHero ? 'rgba(255,255,255,0.72)' : 'var(--text-secondary)' }}>Garage | Foundry | Factory</span>
+                <img
+                  src="/assets/GFF LOGO.png"
+                  alt="GFF AI Logo"
+                  className="h-9 w-auto flex-shrink-0 object-contain xl:h-10 2xl:h-11"
+                />
+                <div className="flex min-w-0 flex-col">
+                  <span className="font-display text-base font-bold leading-none tracking-tight xl:text-lg" style={{ color: lightOnHero ? '#ffffff' : 'var(--text-primary)' }}>GFF AI</span>
+                  <span
+                    className="mt-0.5 hidden text-[10px] uppercase leading-none tracking-[0.2em] 2xl:block"
+                    style={{ color: lightOnHero ? 'rgba(255,255,255,0.72)' : 'var(--text-secondary)' }}
+                  >
+                    Garage | Foundry | Factory
+                  </span>
                 </div>
               </Link>
             </motion.div>
 
-            {/* Desktop Nav - hidden below 1180px */}
-            <div className="hidden min-[1180px]:flex flex-1 min-w-0 items-center justify-center gap-1 px-4 xl:gap-2 2xl:gap-3">
+            {/* Desktop Nav */}
+            <div className="hidden min-w-0 flex-1 items-center justify-center gap-1 px-4 xl:flex xl:gap-1.5 2xl:gap-3">
               {desktopNavItems.map((link) => (
                 <NavLink
                   key={link.label}
                   to={link.to}
                   end={link.end}
                   className={({ isActive }) =>
-                    `group relative whitespace-nowrap rounded-xl px-2 py-2 text-[12px] leading-none transition-colors duration-300 xl:px-2.5 xl:text-[13px] 2xl:px-3 2xl:text-sm ${isActive ? (lightOnHero ? 'text-white' : 'text-[var(--text-primary)]') : (lightOnHero ? 'text-white/70 hover:text-white' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]')
+                    `group relative whitespace-nowrap rounded-xl px-2 py-2 text-[12px] leading-none transition-colors duration-300 xl:px-2 xl:text-[12px] 2xl:px-3 2xl:text-sm ${isActive ? (lightOnHero ? 'text-white' : 'text-[var(--text-primary)]') : (lightOnHero ? 'text-white/70 hover:text-white' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]')
                     }`
                   }
                 >
@@ -128,7 +122,7 @@ export default function Navbar() {
             </div>
 
             {/* Right Actions */}
-            <div className="hidden min-[1180px]:flex shrink-0 items-center gap-2.5">
+            <div className="hidden shrink-0 items-center gap-2 xl:flex xl:gap-2.5">
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
@@ -162,7 +156,7 @@ export default function Navbar() {
 
               <Link
                 to="/portal"
-                className={`rounded-2xl border px-3.5 py-2 text-[13px] transition-all duration-300 whitespace-nowrap xl:px-4 xl:text-sm ${lightOnHero ? 'border-white/12 bg-white/[0.06] text-white/90 hover:border-white/20' : 'border-[var(--border-default)] bg-[var(--chip-bg)] hover:border-[var(--border-hover)]'}`}
+                className={`whitespace-nowrap rounded-2xl border px-3 py-2 text-[13px] transition-all duration-300 xl:px-3.5 xl:text-sm ${lightOnHero ? 'border-white/12 bg-white/[0.06] text-white/90 hover:border-white/20' : 'border-[var(--border-default)] bg-[var(--chip-bg)] hover:border-[var(--border-hover)]'}`}
                 style={lightOnHero ? undefined : { color: 'var(--text-primary)' }}
               >
                 Client Login
@@ -175,7 +169,7 @@ export default function Navbar() {
                 <Link
                   to="/contact"
                   onClick={() => trackNavClick('Book a Consultation', '/contact')}
-                  className="rounded-2xl bg-gff-gradient px-4 py-2.5 text-[13px] font-medium text-white sheen-btn transition-all duration-300 hover-gff-glow whitespace-nowrap xl:px-5 xl:text-sm"
+                  className="sheen-btn whitespace-nowrap rounded-2xl bg-gff-gradient px-4 py-2.5 text-[13px] font-medium text-white transition-all duration-300 hover-gff-glow xl:px-4.5 xl:text-sm 2xl:px-5"
                 >
                   Book a Consultation
                 </Link>
@@ -183,7 +177,7 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Toggle */}
-            <div className="flex items-center gap-2 min-[1180px]:hidden">
+            <div className="flex items-center gap-2 xl:hidden">
               {/* Mobile Theme Toggle */}
               <button
                 onClick={toggleTheme}
