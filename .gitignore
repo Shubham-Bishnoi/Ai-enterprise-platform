@@ -46,6 +46,3 @@ skills-lock.json
 frontend/app/public/images/new\ card/
 frontend/app/public/images/original-*.webp
 /extra\ /
-
-# Intelligence Forge prototype build output (source is tracked)
-frontend/intelligence-forge/dist/
