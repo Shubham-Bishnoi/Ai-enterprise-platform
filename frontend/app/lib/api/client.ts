@@ -11,7 +11,15 @@
  * from the browser, and no provider key is ever present in this bundle.
  */
 
-const RAW_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? ''
+/**
+ * Public base URL of the GFF AI backend. NEXT_PUBLIC_API_BASE_URL (set in
+ * Vercel/.env.local) always wins; the production Render URL is the fallback
+ * so a build without the env var still reaches the live backend. This is a
+ * public endpoint — no secret lives here.
+ */
+const PRODUCTION_BASE_URL = 'https://gff-ai-backend.onrender.com'
+
+const RAW_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || PRODUCTION_BASE_URL
 
 export const API_BASE_URL = RAW_BASE_URL.replace(/\/$/, '')
 
