@@ -2,6 +2,19 @@
 frontend/app/node_modules/
 frontend/app/dist/
 frontend/gffai.zip
+
+# Next.js frontend build output
+frontend/app/.next/
+frontend/app/out/
+frontend/app/next-env.d.ts
+
+# Pre-redesign snapshot of the old Vite frontend. Kept on disk as a rollback
+# point; deliberately not tracked so it never lands in the repo.
+frontend/app-backup-before-new-design/
+
+# Source design folder (already integrated into frontend/app)
+gff-ai-website/node_modules/
+gff-ai-website/.next/
 *.log
 gffenv/
 **/__pycache__/
@@ -15,3 +28,24 @@ ai/.env
 AI/.env
 frontend/app/.env
 backend/dev_phase05.db
+
+# Stray root-level Next.js trace output
+/.next/
+
+# TypeScript incremental build state
+*.tsbuildinfo
+
+# Local AI-assistant tooling and skill files (not part of the product)
+.agents/
+.claude/
+.impeccable/
+skills-lock.json
+
+# Local design references and raw source artwork (specs, original renders,
+# saved reference sites, screen recordings) — never ship these publicly.
+frontend/app/public/images/new\ card/
+frontend/app/public/images/original-*.webp
+/extra\ /
+
+# Intelligence Forge prototype build output (source is tracked)
+frontend/intelligence-forge/dist/

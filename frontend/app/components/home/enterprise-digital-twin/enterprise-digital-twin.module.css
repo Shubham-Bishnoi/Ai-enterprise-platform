@@ -1,0 +1,152 @@
+/**
+ * Ambient motion for the digital twin.
+ *
+ * Everything that reacts to scroll is a Framer motion value; everything here is
+ * the small amount of *idle* life the object keeps once assembled (travelling
+ * signals, breathing glow, drifting motes). Keeping it in CSS means zero
+ * requestAnimationFrame loops — the browser compositor owns it, and the whole
+ * lot can be frozen with one class or one media query.
+ */
+
+/* No card, no border, no background — the twin floats in the section itself. */
+.host {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  pointer-events: none;
+}
+
+.stage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Frozen when the section leaves the viewport or the tab is hidden. */
+.paused *,
+.paused {
+  animation-play-state: paused !important;
+}
+
+/* ------------------------------- Signals ---------------------------------- */
+
+/*
+ * Travelling pulses. Every path carries pathLength="100", so the dash pattern is
+ * in normalized units and reads identically on a 40px link and a 300px stream.
+ * The gap is far longer than the path, so each line is dark most of the cycle —
+ * with staggered delays only one or two signals are ever in flight at once.
+ */
+.signal {
+  stroke-dasharray: 3 297;
+  stroke-dashoffset: 300;
+  animation: travel 6s linear infinite;
+}
+
+.signalOut {
+  stroke-dasharray: 3 297;
+  stroke-dashoffset: 0;
+  animation: travelOut 7s linear infinite;
+}
+
+@keyframes travel {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes travelOut {
+  to {
+    stroke-dashoffset: 300;
+  }
+}
+
+/* -------------------------------- Core ------------------------------------ */
+
+/* Very slow breathing glow — the only continuous movement in the finished state. */
+.breathe {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: breathe 7s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.07);
+  }
+}
+
+/* ------------------------------ Particles --------------------------------- */
+
+.mote {
+  animation: drift 9s ease-in-out infinite;
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0.25;
+  }
+  50% {
+    transform: translate(6px, -8px);
+    opacity: 0.55;
+  }
+}
+
+/* ------------------------------- Endpoints -------------------------------- */
+
+.endpointPulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: endpointPulse 5.5s ease-in-out infinite;
+}
+
+@keyframes endpointPulse {
+  0%,
+  100% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* ---------------------------- Reduced motion ------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .signal,
+  .signalOut,
+  .breathe,
+  .mote,
+  .endpointPulse {
+    animation: none;
+  }
+
+  /*
+   * Travelling signals are pure motion — with nothing to travel they would just
+   * be a heavy second stroke on top of the connection that is already drawn.
+   */
+  .signal,
+  .signalOut {
+    display: none;
+  }
+
+  .breathe {
+    opacity: 0.7;
+  }
+
+  .mote {
+    opacity: 0.35;
+  }
+
+  .endpointPulse {
+    opacity: 0.18;
+  }
+}
