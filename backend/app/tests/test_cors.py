@@ -15,6 +15,24 @@ def test_parse_comma_separated_cors_origins():
     ]
 
 
+def test_parse_custom_domain_cors_origins_and_ignore_empty_values():
+    settings = Settings(
+        backend_cors_origins=(
+            " http://localhost:5173, http://localhost:3000, ,"
+            " https://ai-enterprise-platform-five.vercel.app, https://gffai.sg, "
+            "https://www.gffai.sg , "
+        ),
+    )
+
+    assert settings.backend_cors_origins == [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://ai-enterprise-platform-five.vercel.app",
+        "https://gffai.sg",
+        "https://www.gffai.sg",
+    ]
+
+
 def test_disallow_wildcard_cors_in_production():
     app = FastAPI()
     settings = Settings(
