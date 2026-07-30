@@ -20,7 +20,7 @@ def test_parse_custom_domain_cors_origins_and_ignore_empty_values():
         backend_cors_origins=(
             " http://localhost:5173, http://localhost:3000, ,"
             " https://ai-enterprise-platform-five.vercel.app, https://gffai.sg, "
-            "https://www.gffai.sg , "
+            "https://www.gffai.sg , https://gffai.ai, https://www.gffai.ai , "
         ),
     )
 
@@ -30,6 +30,8 @@ def test_parse_custom_domain_cors_origins_and_ignore_empty_values():
         "https://ai-enterprise-platform-five.vercel.app",
         "https://gffai.sg",
         "https://www.gffai.sg",
+        "https://gffai.ai",
+        "https://www.gffai.ai",
     ]
 
 
