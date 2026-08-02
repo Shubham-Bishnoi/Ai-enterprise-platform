@@ -17,6 +17,7 @@ import {
 import { cn } from '@/lib/utils'
 import { AgentArcCarousel, SimpleAgentCarousel } from '@/components/home/talk-to-agent/agent-arc-carousel'
 import { type AgentDisplay } from '@/components/home/talk-to-agent/agent-data'
+import { HumanExpertForm } from '@/components/home/talk-to-agent/human-expert-form'
 import {
   FALLBACK_AGENTS,
   fetchAgents,
@@ -343,6 +344,13 @@ export function TalkToAgentSection() {
                   ))}
                 </div>
               )}
+
+              {/* Voluntary human-expert follow-up (the only email capture in chat) */}
+              <HumanExpertForm
+                agentName={activeAgent.name}
+                chatSessionId={sessionId}
+                lastUserMessage={[...messages].reverse().find((m) => m.role === 'user')?.text ?? null}
+              />
 
               {error && (
                 <p role="status" className="border-t border-border bg-secondary/60 px-6 py-3 text-sm text-muted-foreground">

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import JSON, DateTime, String
+from sqlalchemy import JSON, Boolean, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin, utcnow
@@ -10,6 +10,12 @@ class Lead(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "leads"
 
     email: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
+    # Trimmed + lower-cased email; the canonical identity key for reporting.
+    normalized_email: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
+    country: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    consent_status: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    marketing_consent: Mapped[bool] = mapped_column(Boolean, default=False)
+    privacy_policy_version: Mapped[str | None] = mapped_column(String(32), nullable=True)
     name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     company: Mapped[str | None] = mapped_column(String(255), nullable=True)
     phone: Mapped[str | None] = mapped_column(String(64), nullable=True)

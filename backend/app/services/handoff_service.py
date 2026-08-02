@@ -9,8 +9,15 @@ from app.repositories.chat import ChatRepository
 from app.repositories.handoff import HandoffRepository
 from app.schemas.handoff import HandoffRequestCreate, HandoffRequestCreatedData
 from app.schemas.leads import LeadUpsertRequest
+from app.services.lead_capture_service import LeadCaptureService
 from app.services.lead_service import LeadService
 from app.services.notification_service import NotificationService
+
+# Handoff types that represent a specific sales-enquiry type.
+HANDOFF_SOURCE_TYPES = {
+    "proposal": "proposal",
+    "workshop": "workshop",
+}
 
 
 class HandoffService:
@@ -21,6 +28,7 @@ class HandoffService:
         self.chat = ChatRepository(db)
         self.blueprints = BlueprintRepository(db)
         self.leads = LeadService(db)
+        self.capture = LeadCaptureService(db)
         self.notifications = NotificationService()
 
     def create_request(self, payload: HandoffRequestCreate) -> HandoffRequestCreatedData:
@@ -56,6 +64,24 @@ class HandoffService:
             context_json=payload.context,
             status="requested",
         )
+        if lead is not None:
+            source_type = HANDOFF_SOURCE_TYPES.get(payload.handoff_type, "human_handoff")
+            self.capture.record_submission(
+                lead=lead,
+                source_type=source_type,
+                metadata=payload.context,
+                objective_summary=payload.summary,
+                chat_session_id=payload.chat_session_id,
+                blueprint_result_id=payload.blueprint_result_id,
+                handoff_request_id=request.id,
+                enquiry_fields={
+                    "enquiry_type": source_type,
+                    "name": payload.name,
+                    "company": payload.company,
+                    "business_objective": payload.handoff_type,
+                },
+            )
+
         self._safe_capture_event(
             event_name="handoff_requested",
             source=payload.source,

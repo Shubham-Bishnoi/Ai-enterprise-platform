@@ -43,6 +43,9 @@ class BlueprintGenerateRequest(BaseModel):
     risk_appetite: str | None = None
     source: str = "homepage_blueprint"
     chat_session_id: str | None = None
+    # Optional attribution/consent bag (source_page, utm_*, referrer,
+    # consent_status, marketing_consent). Additive — older clients omit it.
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
     @field_validator("top_priorities")
     @classmethod

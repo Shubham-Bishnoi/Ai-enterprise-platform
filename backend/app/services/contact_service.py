@@ -4,8 +4,16 @@ from app.repositories.analytics import AnalyticsRepository
 from app.repositories.contact import ContactRequestRepository
 from app.schemas.contact import ContactRequestCreate, ContactRequestCreatedData
 from app.schemas.leads import LeadUpsertRequest
+from app.services.lead_capture_service import LeadCaptureService
 from app.services.lead_service import LeadService
 from app.services.notification_service import NotificationService
+
+# Contact-form intents that represent a specific sales-enquiry type.
+INTENT_SOURCE_TYPES = {
+    "book_workshop": "workshop",
+    "book_consultation": "consultation",
+    "request_proposal": "proposal",
+}
 
 
 class ContactService:
@@ -14,6 +22,7 @@ class ContactService:
         self.contacts = ContactRequestRepository(db)
         self.analytics = AnalyticsRepository(db)
         self.leads = LeadService(db)
+        self.capture = LeadCaptureService(db)
         self.notifications = NotificationService()
 
     def submit(self, payload: ContactRequestCreate) -> ContactRequestCreatedData:
@@ -39,6 +48,20 @@ class ContactService:
             source=payload.source,
             status="new",
             metadata_json=payload.metadata,
+        )
+
+        source_type = INTENT_SOURCE_TYPES.get(payload.intent, "contact")
+        self.capture.record_submission(
+            lead=lead,
+            source_type=source_type,
+            metadata=payload.metadata,
+            objective_summary=payload.message,
+            contact_request_id=request.id,
+            enquiry_fields={
+                "enquiry_type": source_type,
+                "name": payload.name,
+                "company": payload.company,
+            },
         )
 
         self._safe_capture_event(

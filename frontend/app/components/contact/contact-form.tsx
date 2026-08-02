@@ -5,11 +5,13 @@ import { Check, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { submitContact } from '@/lib/api/forms'
 import { trackEvent } from '@/lib/api/analytics'
+import { leadMetadata } from '@/lib/attribution'
 import { contact } from '@/data/site-content'
 
 const INTENTS = [
   'Book Workshop',
   'Book Consultation',
+  'Request Proposal',
   'Sales',
   'Support',
   'Partnership',
@@ -29,6 +31,7 @@ export function ContactForm() {
   const [email, setEmail] = useState('')
   const [company, setCompany] = useState('')
   const [message, setMessage] = useState('')
+  const [marketingConsent, setMarketingConsent] = useState(false)
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState<string | null>(null)
 
@@ -47,7 +50,15 @@ export function ContactForm() {
     })
 
     try {
-      await submitContact({ name, email, company, intent, message, source: 'contact_page' })
+      await submitContact({
+        name,
+        email,
+        company,
+        intent,
+        message,
+        source: 'contact_page',
+        metadata: leadMetadata({ marketingConsent }),
+      })
       setStatus('sent')
     } catch {
       setStatus('error')
@@ -130,6 +141,18 @@ export function ContactForm() {
         />
       </label>
 
+      <label className="flex items-start gap-2.5">
+        <input
+          type="checkbox"
+          checked={marketingConsent}
+          onChange={(e) => setMarketingConsent(e.target.checked)}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-[#155DFC]"
+        />
+        <span className="text-xs leading-relaxed text-muted-foreground">
+          Keep me informed about GFF AI insights, events and product updates. (Optional)
+        </span>
+      </label>
+
       {error && (
         <p role="alert" className="rounded-2xl bg-secondary px-4 py-3 text-sm text-muted-foreground">
           {error}
@@ -150,6 +173,10 @@ export function ContactForm() {
           'Send Message'
         )}
       </button>
+
+      <p className="text-center text-xs leading-relaxed text-muted-foreground">
+        By submitting this form you agree to GFF AI storing your details to respond to your enquiry.
+      </p>
     </form>
   )
 }

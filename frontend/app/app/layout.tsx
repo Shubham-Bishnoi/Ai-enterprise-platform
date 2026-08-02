@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { Navbar } from '@/components/layout/navbar'
 import { Footer } from '@/components/layout/footer'
+import { AttributionInit } from '@/components/analytics/attribution-init'
 import './globals.css'
 
 const inter = Inter({
@@ -35,6 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`bg-background ${inter.variable}`}>
       <body className="font-sans antialiased">
+        <AttributionInit />
         <Navbar />
         <main>{children}</main>
         <Footer />

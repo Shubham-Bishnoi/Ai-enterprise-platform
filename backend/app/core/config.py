@@ -27,6 +27,14 @@ class Settings(BaseSettings):
     blueprint_engine_version: str = "v1"
     blueprint_default_industry: str = "generic-enterprise"
 
+    # Excel reporting sync (Supabase -> outbox -> Power Automate -> workbook).
+    excel_sync_enabled: bool = False
+    excel_sync_webhook_url: str | None = None
+    excel_sync_webhook_secret: str | None = None
+    excel_sync_batch_size: int = 25
+    excel_sync_max_attempts: int = 8
+    excel_sync_poll_seconds: int = 30
+
     secret_key: str = "dev-secret-change-me"
     redis_url: str | None = None
     email_provider: str | None = None

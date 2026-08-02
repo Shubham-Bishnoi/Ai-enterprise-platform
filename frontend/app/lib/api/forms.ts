@@ -30,6 +30,7 @@ export type ContactInput = {
   intent?: string
   message: string
   source: string
+  metadata?: Record<string, unknown>
 }
 
 export async function submitContact(input: ContactInput): Promise<{ status: string; message: string }> {
@@ -47,7 +48,7 @@ export async function submitContact(input: ContactInput): Promise<{ status: stri
       intent: normalizeContactIntent(input.intent),
       message: input.message,
       source: input.source,
-      metadata: {},
+      metadata: input.metadata ?? {},
     }),
   })
 
@@ -72,6 +73,7 @@ export type ConsultationInput = {
   consultationType: ConsultationType
   notes?: string
   source: string
+  metadata?: Record<string, unknown>
 }
 
 export async function bookConsultation(input: ConsultationInput): Promise<{ status: string; message: string }> {
@@ -92,7 +94,7 @@ export async function bookConsultation(input: ConsultationInput): Promise<{ stat
       timezone: null,
       notes: input.notes || null,
       source: input.source,
-      metadata: {},
+      metadata: input.metadata ?? {},
     }),
   })
 
@@ -119,6 +121,7 @@ export type HandoffInput = {
   company?: string
   chatSessionId?: string
   blueprintResultId?: string
+  metadata?: Record<string, unknown>
 }
 
 export async function createHandoff(input: HandoffInput): Promise<{ status: string; nextStepMessage: string }> {
@@ -139,7 +142,7 @@ export async function createHandoff(input: HandoffInput): Promise<{ status: stri
       source: input.source,
       recommended_specialist: null,
       summary: input.summary,
-      context: {},
+      context: input.metadata ?? {},
     }),
   })
 

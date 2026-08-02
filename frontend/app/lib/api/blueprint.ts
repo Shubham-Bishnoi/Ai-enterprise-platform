@@ -48,6 +48,7 @@ export type BlueprintFormInput = {
   dataReadiness?: string
   leadershipCommitment?: string
   riskAppetite?: string
+  metadata?: Record<string, unknown>
 }
 
 export type BlueprintResult = {
@@ -171,6 +172,7 @@ export async function generateBlueprint(form: BlueprintFormInput): Promise<Bluep
       leadership_commitment: form.leadershipCommitment || null,
       risk_appetite: form.riskAppetite || null,
       source: 'homepage_blueprint',
+      metadata: form.metadata ?? {},
     }),
   })
 

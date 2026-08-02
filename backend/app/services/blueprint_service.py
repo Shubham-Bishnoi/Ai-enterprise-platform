@@ -20,6 +20,7 @@ from app.schemas.blueprint import (
 )
 from app.schemas.handoff import HandoffRequestCreate
 from app.services.handoff_service import HandoffService
+from app.services.lead_capture_service import LeadCaptureService
 from gff_ai.config import get_ai_settings
 from gff_ai.graphs.blueprint_graph import run_blueprint_graph
 from gff_ai.schemas.profile import BlueprintProfile
@@ -34,6 +35,7 @@ class BlueprintService:
         self.blueprints = BlueprintRepository(db)
         self.industries = IndustryPackRepository(db)
         self.use_cases = UseCaseRepository(db)
+        self.capture = LeadCaptureService(db)
 
     def _capture_event(
         self,
@@ -209,6 +211,20 @@ class BlueprintService:
         self.db.add(persisted)
         self.db.flush()
         self.db.refresh(persisted)
+
+        objective = "; ".join(payload.top_priorities)
+        if payload.biggest_challenge:
+            objective = f"{objective} — challenge: {payload.biggest_challenge}" if objective else payload.biggest_challenge
+        self.capture.record_submission(
+            lead=lead,
+            source_type="blueprint",
+            metadata=payload.metadata,
+            objective_summary=objective,
+            blueprint_request_id=request.id,
+            blueprint_result_id=persisted.id,
+            chat_session_id=payload.chat_session_id,
+        )
+
         self.db.commit()
         return self._serialize_result(persisted)
 

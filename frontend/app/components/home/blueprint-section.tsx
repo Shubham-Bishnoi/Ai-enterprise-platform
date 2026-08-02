@@ -25,6 +25,7 @@ import {
 } from '@/lib/api/blueprint'
 import { deriveStructuredBlueprint, type StructuredBlueprint } from '@/lib/blueprint/model'
 import { trackEvent } from '@/lib/api/analytics'
+import { leadMetadata } from '@/lib/attribution'
 import { BlueprintForm, type BlueprintErrors } from '@/components/home/blueprint/blueprint-form'
 import { BlueprintResult } from '@/components/home/blueprint/blueprint-result'
 
@@ -140,7 +141,7 @@ export function BlueprintSection() {
 
     let structured: StructuredBlueprint
     try {
-      const api = await generateBlueprint(form)
+      const api = await generateBlueprint({ ...form, metadata: leadMetadata() })
       structured = deriveStructuredBlueprint(form, api)
     } catch {
       // Backend unavailable — derive from the submitted inputs, clearly flagged.

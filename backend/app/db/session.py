@@ -84,12 +84,54 @@ def create_db_and_tables() -> None:
         ProjectMilestone,
         SupportTicket,
     )
+    from app.models.lead_capture import ExcelSyncOutbox, LeadSubmission  # noqa: F401
     from app.models.resource import Resource  # noqa: F401
     from app.models.search import SearchIndexEntry  # noqa: F401
     from app.models.user import User  # noqa: F401
     from app.models.use_case import UseCase  # noqa: F401
 
     Base.metadata.create_all(bind=get_engine())
+    ensure_lead_capture_schema()
+
+
+# Columns migration 0006 adds to the pre-existing `leads` table, and the two
+# reporting views. Deploys run `create_all` (not Alembic), which never ALTERs
+# existing tables — this guard applies the same changes idempotently so the
+# Render deploy is safe with or without running the migration.
+_LEAD_COLUMNS = {
+    "normalized_email": "VARCHAR(255)",
+    "country": "VARCHAR(128)",
+    "consent_status": "VARCHAR(64)",
+    "marketing_consent": "BOOLEAN NOT NULL DEFAULT false",
+    "privacy_policy_version": "VARCHAR(32)",
+}
+
+
+def ensure_lead_capture_schema() -> None:
+    from sqlalchemy import inspect, text
+
+    engine = get_engine()
+    inspector = inspect(engine)
+    existing_columns = {column["name"] for column in inspector.get_columns("leads")}
+    existing_views = set(inspector.get_view_names())
+
+    from app.db import reporting_views
+
+    with engine.begin() as conn:
+        for name, ddl_type in _LEAD_COLUMNS.items():
+            if name not in existing_columns:
+                column_type = ddl_type if engine.dialect.name != "sqlite" else ddl_type.replace("false", "0")
+                conn.execute(text(f"ALTER TABLE leads ADD COLUMN {name} {column_type}"))
+        if "normalized_email" not in existing_columns:
+            conn.execute(text("UPDATE leads SET normalized_email = LOWER(TRIM(email)) WHERE email IS NOT NULL"))
+
+        if "reporting_website_leads" not in existing_views:
+            conn.execute(text(reporting_views.WEBSITE_LEADS_VIEW))
+        if "reporting_sales_enquiries" not in existing_views:
+            conn.execute(text(reporting_views.SALES_ENQUIRIES_VIEW))
+
+        if engine.dialect.name == "postgresql":
+            conn.execute(text(reporting_views.POSTGRES_HARDENING))
 
 
 def get_db() -> Generator[Session, None, None]:

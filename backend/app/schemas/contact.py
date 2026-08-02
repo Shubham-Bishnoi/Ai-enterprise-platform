@@ -7,6 +7,7 @@ from app.schemas.leads import _validate_email
 KNOWN_CONTACT_INTENTS = {
     "book_workshop",
     "book_consultation",
+    "request_proposal",
     "sales",
     "support",
     "partnership",

@@ -1,3 +1,5 @@
+import asyncio
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -27,6 +29,29 @@ from app.seed.seed_governance import seed_governance
 from app.seed.seed_portal_activity import seed_portal_activity
 
 
+logger = logging.getLogger("app.lifespan")
+
+
+async def _excel_sync_loop() -> None:
+    """Background drain of the Excel outbox. Never raises; an Excel outage
+    only delays reporting rows — it can never affect visitor submissions."""
+    from app.services.excel_sync_service import ExcelSyncService
+
+    settings = get_settings()
+    while True:
+        try:
+            def _run_batch() -> None:
+                with get_session_factory()() as db:
+                    ExcelSyncService(db, settings).process_due()
+
+            await asyncio.to_thread(_run_batch)
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            logger.exception("excel_sync loop iteration failed")
+        await asyncio.sleep(settings.excel_sync_poll_seconds)
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     create_db_and_tables()
@@ -48,7 +73,23 @@ async def lifespan(_: FastAPI):
         seed_documents(db)
         seed_governance(db)
         seed_portal_activity(db)
+
+    from app.services.excel_sync_service import is_configured
+
+    settings = get_settings()
+    sync_task: asyncio.Task | None = None
+    if is_configured(settings) and not settings.testing:
+        sync_task = asyncio.create_task(_excel_sync_loop())
+        logger.info("excel_sync worker started (poll every %ss)", settings.excel_sync_poll_seconds)
+
     yield
+
+    if sync_task is not None:
+        sync_task.cancel()
+        try:
+            await sync_task
+        except asyncio.CancelledError:
+            pass
 
 
 def create_app() -> FastAPI:

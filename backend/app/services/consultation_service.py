@@ -8,6 +8,7 @@ from app.schemas.consultation import (
     ConsultationSlotsData,
 )
 from app.schemas.leads import LeadUpsertRequest
+from app.services.lead_capture_service import LeadCaptureService
 from app.services.lead_service import LeadService
 from app.services.notification_service import NotificationService
 
@@ -18,6 +19,7 @@ class ConsultationService:
         self.consultations = ConsultationRepository(db)
         self.analytics = AnalyticsRepository(db)
         self.leads = LeadService(db)
+        self.capture = LeadCaptureService(db)
         self.notifications = NotificationService()
 
     def book(self, payload: ConsultationBookingCreate) -> ConsultationBookingCreatedData:
@@ -48,6 +50,25 @@ class ConsultationService:
             metadata_json=payload.metadata,
         )
         lead.status = "workshop_requested" if payload.consultation_type == "executive_workshop" else lead.status
+
+        source_type = "workshop" if payload.consultation_type == "executive_workshop" else "consultation"
+        self.capture.record_submission(
+            lead=lead,
+            source_type=source_type,
+            metadata=payload.metadata,
+            objective_summary=payload.notes,
+            consultation_booking_id=booking.id,
+            enquiry_fields={
+                "enquiry_type": source_type,
+                "name": payload.name,
+                "company": payload.company,
+                "business_objective": payload.consultation_type,
+                "workshop_topic": payload.notes if source_type == "workshop" else None,
+                "preferred_date": payload.preferred_date,
+                "preferred_time": payload.preferred_time,
+                "timezone": payload.timezone,
+            },
+        )
 
         self._safe_capture_event(
             event_name="consultation_requested",
