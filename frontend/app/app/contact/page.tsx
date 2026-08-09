@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Mail, MapPin, Phone } from 'lucide-react'
+import { Mail, Phone } from 'lucide-react'
 import { PageHero } from '@/components/ui/page-hero'
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
 import { ContactForm } from '@/components/contact/contact-form'
@@ -33,10 +33,6 @@ export default function ContactPage() {
           <ScrollReveal delay={0.08} className="flex flex-col gap-6">
             <div className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-8 shadow-brand-soft">
               <h2 className="text-lg font-semibold text-navy">Reach us directly</h2>
-              <p className="flex items-start gap-3 text-sm leading-relaxed text-muted-foreground">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-blue" aria-hidden="true" />
-                {contact.address}
-              </p>
               <a
                 href={`mailto:${contact.email}`}
                 className="flex items-center gap-3 text-sm text-muted-foreground transition-colors hover:text-navy"

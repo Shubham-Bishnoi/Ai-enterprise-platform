@@ -1,5 +1,4 @@
 export const contact = {
-  address: '68 Circular Road, #02-01, Singapore- 049422, Singapore',
   email: 'hello@gffai.ai',
   phone: '+65-93239991',
 }
