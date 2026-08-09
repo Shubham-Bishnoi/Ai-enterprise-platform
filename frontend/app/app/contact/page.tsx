@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Mail, Phone } from 'lucide-react'
+import { Mail } from 'lucide-react'
 import { PageHero } from '@/components/ui/page-hero'
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
 import { ContactForm } from '@/components/contact/contact-form'
@@ -39,13 +39,6 @@ export default function ContactPage() {
               >
                 <Mail className="h-4 w-4 shrink-0 text-brand-blue" aria-hidden="true" />
                 {contact.email}
-              </a>
-              <a
-                href={`tel:${contact.phone.replace(/[^+\d]/g, '')}`}
-                className="flex items-center gap-3 text-sm text-muted-foreground transition-colors hover:text-navy"
-              >
-                <Phone className="h-4 w-4 shrink-0 text-brand-blue" aria-hidden="true" />
-                {contact.phone}
               </a>
             </div>
 

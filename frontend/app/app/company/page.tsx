@@ -125,7 +125,7 @@ export default function CompanyPage() {
 
           <ScrollReveal className="flex flex-col items-center gap-4 pt-4 text-center">
             <p className="text-sm text-muted-foreground">
-              {contact.email} · {contact.phone}
+              {contact.email}
             </p>
             <BrandButton href="/contact" size="lg">
               Get in Touch

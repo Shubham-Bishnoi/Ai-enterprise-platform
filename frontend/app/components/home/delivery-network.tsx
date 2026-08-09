@@ -13,7 +13,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { ArrowLeft, ArrowRight, Check, ChevronDown, Mail, MapPin, Phone } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, ChevronDown, Mail, MapPin } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { contact } from '@/data/site-content'
 
@@ -506,16 +506,6 @@ export function DeliveryNetworkExplorer() {
               <span className="flex flex-col leading-tight">
                 <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Email GFF AI</span>
                 <span className="text-sm font-medium text-navy">{contact.email}</span>
-              </span>
-            </a>
-            <a
-              href="tel:+6593239991"
-              className="flex items-center gap-2.5 rounded-full border border-navy/10 bg-white px-4 py-2.5 transition-colors hover:border-brand-blue/35 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
-            >
-              <Phone className="h-4 w-4 shrink-0 text-brand-blue" aria-hidden="true" />
-              <span className="flex flex-col leading-tight">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Call Singapore</span>
-                <span className="text-sm font-medium text-navy">{contact.phone}</span>
               </span>
             </a>
           </div>

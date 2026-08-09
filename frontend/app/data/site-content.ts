@@ -1,6 +1,5 @@
 export const contact = {
   email: 'hello@gffai.ai',
-  phone: '+65-93239991',
 }
 
 export const legalText =

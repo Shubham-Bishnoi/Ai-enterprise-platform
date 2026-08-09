@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Mail, Phone } from 'lucide-react'
+import { Mail } from 'lucide-react'
 import { footerNav } from '@/data/navigation'
 import { contact, legalText } from '@/data/site-content'
 
@@ -50,10 +50,6 @@ export function Footer() {
             <a href={`mailto:${contact.email}`} className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-navy">
               <Mail className="h-4 w-4 shrink-0 text-brand-blue" aria-hidden="true" />
               {contact.email}
-            </a>
-            <a href={`tel:${contact.phone}`} className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-navy">
-              <Phone className="h-4 w-4 shrink-0 text-brand-blue" aria-hidden="true" />
-              {contact.phone}
             </a>
           </div>
         </div>
