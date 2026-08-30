@@ -8,6 +8,7 @@ import { Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { navLinks } from '@/data/navigation'
 import { useScrollDirection } from '@/lib/hooks/use-scroll-direction'
+import { trackCta } from '@/lib/api/analytics'
 
 /**
  * Direction-aware floating navbar. Three states:
@@ -97,6 +98,7 @@ export function Navbar() {
             </Link>
             <Link
               href="/contact"
+              onClick={() => trackCta('navbar_book_consultation', 'website', 'Navbar')}
               className="whitespace-nowrap rounded-full bg-brand-blue hover:bg-brand-blue-hover px-5 py-2.5 text-sm font-medium text-white shadow-brand-soft transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(21,93,252,0.3)]"
             >
               Book a Consultation
@@ -139,6 +141,7 @@ export function Navbar() {
               </Link>
               <Link
                 href="/contact"
+                onClick={() => trackCta('navbar_book_consultation', 'website', 'Navbar')}
                 className="rounded-full bg-brand-blue px-5 py-3 text-center text-sm font-medium text-white shadow-brand-soft transition-colors hover:bg-brand-blue-hover"
               >
                 Book a Consultation

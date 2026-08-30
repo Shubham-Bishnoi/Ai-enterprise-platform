@@ -58,6 +58,34 @@ export function BlueprintSection() {
   const [progressIndex, setProgressIndex] = useState(0)
   const [result, setResult] = useState<StructuredBlueprint | null>(null)
   const progressTimer = useRef<ReturnType<typeof setInterval> | null>(null)
+  const sectionRef = useRef<HTMLElement | null>(null)
+  const openedTracked = useRef(false)
+  const startedTracked = useRef(false)
+
+  // blueprint_opened: fires once when the generator scrolls into view.
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting) && !openedTracked.current) {
+          openedTracked.current = true
+          trackEvent({ eventName: 'blueprint_opened', source: 'homepage', component: 'BlueprintSection' })
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.3 },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  // blueprint_started: fires once, on the first field the visitor touches.
+  const trackStarted = () => {
+    if (startedTracked.current) return
+    startedTracked.current = true
+    trackEvent({ eventName: 'blueprint_started', source: 'homepage', component: 'BlueprintSection' })
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -80,6 +108,7 @@ export function BlueprintSection() {
   }, [])
 
   const onField = (patch: Partial<BlueprintFormInput>) => {
+    trackStarted()
     setForm((prev) => ({ ...prev, ...patch }))
     // Clear the error for any field being edited.
     const keys = Object.keys(patch) as (keyof BlueprintFormInput)[]
@@ -91,6 +120,7 @@ export function BlueprintSection() {
   }
 
   const onTogglePriority = (value: string) => {
+    trackStarted()
     setForm((prev) => ({
       ...prev,
       topPriorities: prev.topPriorities.includes(value)
@@ -127,12 +157,9 @@ export function BlueprintSection() {
       setProgressIndex((i) => (i + 1) % PROGRESS_MESSAGES.length)
     }, 1400)
 
-    trackEvent({
-      eventName: 'blueprint_generate_submitted',
-      source: 'homepage',
-      component: 'BlueprintSection',
-      payload: { industry: form.industry, company_size: form.companySize },
-    })
+    // The backend records the authoritative generation attempt/success/failure
+    // events (blueprint_generate_started/completed/failed); the client only
+    // reports failures the server never saw (network-level errors).
 
     // Keep the progress state visible long enough to be meaningful even when the
     // call resolves quickly, without inventing fake percentages.
@@ -145,6 +172,18 @@ export function BlueprintSection() {
       structured = deriveStructuredBlueprint(form, api)
     } catch {
       // Backend unavailable — derive from the submitted inputs, clearly flagged.
+      trackEvent({
+        eventName: 'blueprint_generation_failed',
+        source: 'homepage',
+        component: 'BlueprintSection',
+        payload: { industry: form.industry, reason: 'backend_unreachable' },
+      })
+      trackEvent({
+        eventName: 'form_submission_failed',
+        source: 'homepage',
+        component: 'BlueprintSection',
+        payload: { form: 'blueprint', reason: 'backend_unreachable' },
+      })
       structured = deriveStructuredBlueprint(form, null)
     }
 
@@ -162,7 +201,7 @@ export function BlueprintSection() {
   }
 
   return (
-    <section id="blueprint" className="gradient-cta scroll-mt-24 py-20 md:py-28">
+    <section id="blueprint" ref={sectionRef} className="gradient-cta scroll-mt-24 py-20 md:py-28">
       <div className="mx-auto flex max-w-7xl flex-col gap-12 px-4 sm:px-6 lg:px-8">
         {/* Visual introduction — the interactive generator follows immediately below. */}
         <SplitVisualFeature

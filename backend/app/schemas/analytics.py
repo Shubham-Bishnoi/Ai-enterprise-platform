@@ -4,14 +4,41 @@ from typing import Any
 from pydantic import BaseModel, Field, field_validator
 
 
+class SessionContext(BaseModel):
+    """Privacy-safe session attributes the browser may send with any event.
+
+    Only ever used to create/refresh the anonymous `analytics_sessions` row —
+    nothing here identifies a person.
+    """
+
+    landing_page: str | None = Field(default=None, max_length=512)
+    referrer: str | None = Field(default=None, max_length=512)
+    utm_source: str | None = Field(default=None, max_length=255)
+    utm_medium: str | None = Field(default=None, max_length=255)
+    utm_campaign: str | None = Field(default=None, max_length=255)
+    utm_term: str | None = Field(default=None, max_length=255)
+    utm_content: str | None = Field(default=None, max_length=255)
+    device_category: str | None = Field(default=None, max_length=32)
+    browser_category: str | None = Field(default=None, max_length=32)
+    consent_status: str | None = Field(default=None, max_length=64)
+
+
 class AnalyticsEventCreate(BaseModel):
-    session_id: str | None = None
-    lead_id: str | None = None
-    event_name: str
-    source: str
-    page_path: str | None = None
-    component: str | None = None
+    # Client-generated UUID for idempotency; optional for legacy bundles.
+    event_id: str | None = Field(default=None, max_length=64)
+    session_id: str | None = Field(default=None, max_length=64)  # chat session
+    anonymous_id: str | None = Field(default=None, max_length=64)
+    visitor_session_id: str | None = Field(default=None, max_length=64)
+    lead_id: str | None = Field(default=None, max_length=64)
+    event_name: str = Field(max_length=128)
+    source: str = Field(max_length=128)
+    page_path: str | None = Field(default=None, max_length=255)
+    component: str | None = Field(default=None, max_length=128)
+    entity_type: str | None = Field(default=None, max_length=64)
+    entity_id: str | None = Field(default=None, max_length=64)
+    occurred_at: datetime | None = None
     payload: dict[str, Any] = Field(default_factory=dict)
+    session_context: SessionContext | None = None
 
     @field_validator("event_name", "source")
     @classmethod
@@ -22,20 +49,13 @@ class AnalyticsEventCreate(BaseModel):
         return cleaned
 
 
-class AnalyticsEventOut(BaseModel):
-    id: str
-    session_id: str | None = None
-    lead_id: str | None = None
-    event_name: str
-    source: str
-    page_path: str | None = None
-    component: str | None = None
-    payload: dict[str, Any]
-    user_agent: str | None = None
-    ip_hash: str | None = None
-    created_at: datetime
+class AnalyticsEventAck(BaseModel):
+    """Ingestion acknowledgement. Deliberately does not echo the payload."""
 
-    model_config = {"from_attributes": True}
+    id: str | None = None
+    event_id: str | None = None
+    stored: bool
+    duplicate: bool = False
 
 
 class AnalyticsSummaryData(BaseModel):

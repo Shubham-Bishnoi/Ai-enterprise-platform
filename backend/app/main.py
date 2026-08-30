@@ -52,6 +52,33 @@ async def _excel_sync_loop() -> None:
         await asyncio.sleep(settings.excel_sync_poll_seconds)
 
 
+async def _daily_report_loop() -> None:
+    """Scheduler for the daily activity email (23:55 Asia/Kolkata by default).
+
+    Ticks every `report_poll_seconds`; the service decides which report dates
+    are due (today after send time, missed yesterday, failed runs whose
+    backoff elapsed), so a restart or a Render sleep never loses a report and
+    the (report_date, timezone) unique row prevents duplicates. Never raises.
+    """
+    from app.services.daily_report_service import DailyReportService
+
+    settings = get_settings()
+    while True:
+        try:
+            def _run_due() -> None:
+                with get_session_factory()() as db:
+                    service = DailyReportService(db, settings)
+                    for report_date in service.due_report_dates():
+                        service.run_for_date(report_date)
+
+            await asyncio.to_thread(_run_due)
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            logger.exception("daily_report loop iteration failed")
+        await asyncio.sleep(settings.report_poll_seconds)
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     create_db_and_tables()
@@ -74,6 +101,7 @@ async def lifespan(_: FastAPI):
         seed_governance(db)
         seed_portal_activity(db)
 
+    from app.services.daily_report_service import is_report_configured
     from app.services.excel_sync_service import is_configured
 
     settings = get_settings()
@@ -82,14 +110,25 @@ async def lifespan(_: FastAPI):
         sync_task = asyncio.create_task(_excel_sync_loop())
         logger.info("excel_sync worker started (poll every %ss)", settings.excel_sync_poll_seconds)
 
+    report_task: asyncio.Task | None = None
+    if is_report_configured(settings) and not settings.testing:
+        report_task = asyncio.create_task(_daily_report_loop())
+        logger.info(
+            "daily_report scheduler started (send %02d:%02d %s)",
+            settings.report_send_hour,
+            settings.report_send_minute,
+            settings.report_timezone,
+        )
+
     yield
 
-    if sync_task is not None:
-        sync_task.cancel()
-        try:
-            await sync_task
-        except asyncio.CancelledError:
-            pass
+    for task in (sync_task, report_task):
+        if task is not None:
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
 
 
 def create_app() -> FastAPI:

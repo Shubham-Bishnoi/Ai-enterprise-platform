@@ -24,11 +24,13 @@ def client(tmp_path, monkeypatch):
     from app.core.config import get_settings
     from app.db.session import reset_engine
     from app.main import create_app
+    from app.services.rate_limit_service import RateLimitService
     from gff_ai.config import get_ai_settings
 
     get_settings.cache_clear()
     get_ai_settings.cache_clear()
     reset_engine()
+    RateLimitService.reset()
 
     app = create_app()
     with TestClient(app) as test_client:

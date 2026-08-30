@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Check, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { submitContact } from '@/lib/api/forms'
@@ -25,6 +25,14 @@ const inputClass =
 
 type Status = 'idle' | 'sending' | 'sent' | 'error'
 
+// Intents that represent a specific conversion journey get their own event
+// on top of the generic contact_form_submitted.
+const INTENT_EVENTS: Record<string, 'workshop_booking_submitted' | 'consultation_requested' | 'proposal_requested'> = {
+  'Book Workshop': 'workshop_booking_submitted',
+  'Book Consultation': 'consultation_requested',
+  'Request Proposal': 'proposal_requested',
+}
+
 export function ContactForm() {
   const [intent, setIntent] = useState<string>('Book Consultation')
   const [name, setName] = useState('')
@@ -34,6 +42,13 @@ export function ContactForm() {
   const [marketingConsent, setMarketingConsent] = useState(false)
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState<string | null>(null)
+  const startedTracked = useRef(false)
+
+  const trackStarted = () => {
+    if (startedTracked.current) return
+    startedTracked.current = true
+    trackEvent({ eventName: 'contact_form_started', source: 'contact_page', component: 'ContactForm' })
+  }
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,13 +56,6 @@ export function ContactForm() {
 
     setStatus('sending')
     setError(null)
-
-    trackEvent({
-      eventName: 'contact_submitted',
-      source: 'contact_page',
-      component: 'ContactForm',
-      payload: { intent },
-    })
 
     try {
       await submitContact({
@@ -60,8 +68,24 @@ export function ContactForm() {
         metadata: leadMetadata({ marketingConsent }),
       })
       setStatus('sent')
+      trackEvent({
+        eventName: 'contact_form_submitted',
+        source: 'contact_page',
+        component: 'ContactForm',
+        payload: { intent },
+      })
+      const intentEvent = INTENT_EVENTS[intent]
+      if (intentEvent) {
+        trackEvent({ eventName: intentEvent, source: 'contact_page', component: 'ContactForm', payload: { intent } })
+      }
     } catch {
       setStatus('error')
+      trackEvent({
+        eventName: 'form_submission_failed',
+        source: 'contact_page',
+        component: 'ContactForm',
+        payload: { form: 'contact', intent },
+      })
       setError(
         `We could not submit your message right now. Please email us directly at ${contact.email} and we will pick it up.`,
       )
@@ -109,7 +133,7 @@ export function ContactForm() {
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="flex flex-col gap-2">
           <span className="text-sm font-medium text-navy">Name</span>
-          <input required value={name} onChange={(e) => setName(e.target.value)} className={inputClass} placeholder="Your name" />
+          <input required value={name} onFocus={trackStarted} onChange={(e) => setName(e.target.value)} className={inputClass} placeholder="Your name" />
         </label>
         <label className="flex flex-col gap-2">
           <span className="text-sm font-medium text-navy">Work email</span>
@@ -117,6 +141,7 @@ export function ContactForm() {
             required
             type="email"
             value={email}
+            onFocus={trackStarted}
             onChange={(e) => setEmail(e.target.value)}
             className={inputClass}
             placeholder="you@company.com"
@@ -135,6 +160,7 @@ export function ContactForm() {
           required
           rows={5}
           value={message}
+          onFocus={trackStarted}
           onChange={(e) => setMessage(e.target.value)}
           className={cn(inputClass, 'resize-y')}
           placeholder="Tell us about your transformation goals…"

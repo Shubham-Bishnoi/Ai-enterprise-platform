@@ -72,7 +72,7 @@ def test_analytics_event_creation(client):
         "/api/v1/analytics/events",
         json={
             "session_id": session_id,
-            "event_name": "talk_to_agent_error",
+            "event_name": "agent_conversation_started",
             "source": "backend_test",
             "payload": {"reason": "synthetic"},
         },
@@ -80,5 +80,14 @@ def test_analytics_event_creation(client):
 
     assert response.status_code == 200
     payload = response.json()["data"]
-    assert payload["event_name"] == "talk_to_agent_error"
-    assert payload["session_id"] == session_id
+    assert payload["stored"] is True
+
+    from app.db.session import get_session_factory
+    from app.models.analytics import AnalyticsEvent
+    from sqlalchemy import select
+
+    with get_session_factory()() as db:
+        event = db.scalars(
+            select(AnalyticsEvent).where(AnalyticsEvent.event_name == "agent_conversation_started")
+        ).one()
+        assert event.session_id == session_id

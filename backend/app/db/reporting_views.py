@@ -74,6 +74,30 @@ LEFT JOIN handoff_requests hr ON hr.id = s.handoff_request_id
 WHERE s.source_type IN ('contact', 'consultation', 'workshop', 'proposal', 'human_handoff')
 """
 
+# Same posture for the analytics + daily-report tables: the backend service
+# role is the only reader/writer; Supabase anon/authenticated roles get
+# nothing. RLS is enabled with no policies, so even a leaked anon key sees
+# zero rows.
+ANALYTICS_HARDENING = """
+DO $$
+BEGIN
+    EXECUTE 'ALTER TABLE analytics_events ENABLE ROW LEVEL SECURITY';
+    EXECUTE 'ALTER TABLE analytics_sessions ENABLE ROW LEVEL SECURITY';
+    EXECUTE 'ALTER TABLE daily_report_runs ENABLE ROW LEVEL SECURITY';
+    IF EXISTS (SELECT FROM pg_roles WHERE rolname = 'anon') THEN
+        EXECUTE 'REVOKE ALL ON analytics_events FROM anon';
+        EXECUTE 'REVOKE ALL ON analytics_sessions FROM anon';
+        EXECUTE 'REVOKE ALL ON daily_report_runs FROM anon';
+    END IF;
+    IF EXISTS (SELECT FROM pg_roles WHERE rolname = 'authenticated') THEN
+        EXECUTE 'REVOKE ALL ON analytics_events FROM authenticated';
+        EXECUTE 'REVOKE ALL ON analytics_sessions FROM authenticated';
+        EXECUTE 'REVOKE ALL ON daily_report_runs FROM authenticated';
+    END IF;
+END
+$$;
+"""
+
 POSTGRES_HARDENING = """
 DO $$
 BEGIN

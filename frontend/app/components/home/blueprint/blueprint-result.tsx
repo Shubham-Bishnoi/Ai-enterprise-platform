@@ -26,6 +26,7 @@ import {
   Target,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { trackEvent } from '@/lib/api/analytics'
 import type { Complexity, Priority, StructuredBlueprint } from '@/lib/blueprint/model'
 import { ArchitectureDiagram } from './architecture-diagram'
 
@@ -71,6 +72,12 @@ export function BlueprintResult({
   )
 
   const download = useCallback(() => {
+    trackEvent({
+      eventName: 'blueprint_downloaded',
+      source: 'homepage',
+      component: 'BlueprintResult',
+      payload: { industry: blueprint.industryVisualKey },
+    })
     const text = blueprintToText(blueprint)
     const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
     const url = URL.createObjectURL(blob)

@@ -90,8 +90,12 @@ def create_db_and_tables() -> None:
     from app.models.user import User  # noqa: F401
     from app.models.use_case import UseCase  # noqa: F401
 
+    from app.models.analytics import AnalyticsSession  # noqa: F401
+    from app.models.daily_report import DailyReportRun  # noqa: F401
+
     Base.metadata.create_all(bind=get_engine())
     ensure_lead_capture_schema()
+    ensure_analytics_schema()
 
 
 # Columns migration 0006 adds to the pre-existing `leads` table, and the two
@@ -132,6 +136,54 @@ def ensure_lead_capture_schema() -> None:
 
         if engine.dialect.name == "postgresql":
             conn.execute(text(reporting_views.POSTGRES_HARDENING))
+
+
+# Columns migration 0007 adds to the pre-existing `analytics_events` table.
+# Same guard pattern as `_LEAD_COLUMNS`: deploys run `create_all`, which never
+# ALTERs existing tables, so these are applied idempotently at startup.
+_ANALYTICS_EVENT_COLUMNS = {
+    "event_id": "VARCHAR(64)",
+    "anonymous_id": "VARCHAR(64)",
+    "visitor_session_id": "VARCHAR(64)",
+    "entity_type": "VARCHAR(64)",
+    "entity_id": "VARCHAR(64)",
+    "occurred_at": "TIMESTAMPTZ",
+}
+
+_ANALYTICS_EVENT_INDEXES = {
+    "ix_analytics_events_event_id": "CREATE UNIQUE INDEX ix_analytics_events_event_id ON analytics_events (event_id)",
+    "ix_analytics_events_anonymous_id": "CREATE INDEX ix_analytics_events_anonymous_id ON analytics_events (anonymous_id)",
+    "ix_analytics_events_visitor_session_id": (
+        "CREATE INDEX ix_analytics_events_visitor_session_id ON analytics_events (visitor_session_id)"
+    ),
+    "ix_analytics_events_occurred_at": "CREATE INDEX ix_analytics_events_occurred_at ON analytics_events (occurred_at)",
+    "ix_analytics_events_created_at": "CREATE INDEX ix_analytics_events_created_at ON analytics_events (created_at)",
+    "ix_analytics_events_page_path": "CREATE INDEX ix_analytics_events_page_path ON analytics_events (page_path)",
+    "ix_analytics_events_entity": "CREATE INDEX ix_analytics_events_entity ON analytics_events (entity_type, entity_id)",
+}
+
+
+def ensure_analytics_schema() -> None:
+    from sqlalchemy import inspect, text
+
+    from app.db import reporting_views
+
+    engine = get_engine()
+    inspector = inspect(engine)
+    existing_columns = {column["name"] for column in inspector.get_columns("analytics_events")}
+    existing_indexes = {index["name"] for index in inspector.get_indexes("analytics_events")}
+
+    with engine.begin() as conn:
+        for name, ddl_type in _ANALYTICS_EVENT_COLUMNS.items():
+            if name not in existing_columns:
+                column_type = ddl_type if engine.dialect.name != "sqlite" else ddl_type.replace("TIMESTAMPTZ", "TIMESTAMP")
+                conn.execute(text(f"ALTER TABLE analytics_events ADD COLUMN {name} {column_type}"))
+        for index_name, ddl in _ANALYTICS_EVENT_INDEXES.items():
+            if index_name not in existing_indexes:
+                conn.execute(text(ddl))
+
+        if engine.dialect.name == "postgresql":
+            conn.execute(text(reporting_views.ANALYTICS_HARDENING))
 
 
 def get_db() -> Generator[Session, None, None]:

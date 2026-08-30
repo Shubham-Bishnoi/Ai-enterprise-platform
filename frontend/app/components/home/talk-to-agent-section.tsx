@@ -75,6 +75,21 @@ export function TalkToAgentSection() {
   const [error, setError] = useState<string | null>(null)
 
   const scrollRef = useRef<HTMLDivElement>(null)
+  // Chat sessions whose conversation-started event has already been sent.
+  const conversationTracked = useRef<Set<string>>(new Set())
+
+  const trackConversationStarted = useCallback((chatSessionId: string | null, agentId: string) => {
+    const key = chatSessionId ?? 'no-session'
+    if (conversationTracked.current.has(key)) return
+    conversationTracked.current.add(key)
+    trackEvent({
+      eventName: 'agent_conversation_started',
+      source: 'homepage',
+      component: 'TalkToAgentSection',
+      sessionId: chatSessionId,
+      payload: { agent_id: agentId },
+    })
+  }, [])
 
   // Load the live agent roster; fall back to the static mirror on failure.
   useEffect(() => {
@@ -137,12 +152,22 @@ export function TalkToAgentSection() {
   )
 
   const closeAgent = useCallback(() => {
+    // Leaving the panel after actually chatting ends the conversation.
+    if (activeAgent && messages.some((m) => m.role === 'user')) {
+      trackEvent({
+        eventName: 'agent_conversation_completed',
+        source: 'homepage',
+        component: 'TalkToAgentSection',
+        sessionId,
+        payload: { agent_id: activeAgent.id, user_messages: messages.filter((m) => m.role === 'user').length },
+      })
+    }
     setActiveAgent(null)
     setSessionId(null)
     setMessages([])
     setInput('')
     setError(null)
-  }, [])
+  }, [activeAgent, messages, sessionId])
 
   const pushUser = (text: string) => {
     setMessages((prev) => [...prev, { id: `u_${Date.now()}`, role: 'user', text }])
@@ -162,6 +187,7 @@ export function TalkToAgentSection() {
         return
       }
 
+      trackConversationStarted(sessionId, activeAgent.id)
       setSending(true)
       try {
         const turn = await sendAgentMessage({
@@ -176,7 +202,7 @@ export function TalkToAgentSection() {
         setSending(false)
       }
     },
-    [activeAgent, sending, sessionId],
+    [activeAgent, sending, sessionId, trackConversationStarted],
   )
 
   const runQuickAction = useCallback(
@@ -191,6 +217,14 @@ export function TalkToAgentSection() {
         return
       }
 
+      trackEvent({
+        eventName: 'starter_chip_selected',
+        source: 'homepage',
+        component: 'TalkToAgentSection',
+        sessionId,
+        payload: { agent_id: activeAgent.id, chip: label },
+      })
+      trackConversationStarted(sessionId, activeAgent.id)
       setSending(true)
       try {
         const turn = await sendAgentQuickAction({
@@ -205,7 +239,7 @@ export function TalkToAgentSection() {
         setSending(false)
       }
     },
-    [activeAgent, sending, sessionId],
+    [activeAgent, sending, sessionId, trackConversationStarted],
   )
 
   const online = !offline

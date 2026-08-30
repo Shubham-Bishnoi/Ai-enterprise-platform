@@ -47,13 +47,6 @@ export function HumanExpertForm({
     setError(null)
     setPhase('sending')
 
-    trackEvent({
-      eventName: 'human_expert_requested',
-      source: 'talk_to_agent_chat',
-      component: 'HumanExpertForm',
-      payload: { has_session: Boolean(chatSessionId) },
-    })
-
     let summary = `Visitor chatting with ${agentName} asked for a human expert follow-up.`
     if (lastUserMessage) summary += ` Last question: ${lastUserMessage.slice(0, 160)}`
 
@@ -69,8 +62,21 @@ export function HumanExpertForm({
         metadata: leadMetadata(),
       })
       setPhase('sent')
+      trackEvent({
+        eventName: 'human_handoff_requested',
+        source: 'talk_to_agent_chat',
+        component: 'HumanExpertForm',
+        sessionId: chatSessionId,
+        payload: { has_session: Boolean(chatSessionId) },
+      })
     } catch {
       setPhase('open')
+      trackEvent({
+        eventName: 'form_submission_failed',
+        source: 'talk_to_agent_chat',
+        component: 'HumanExpertForm',
+        payload: { form: 'human_expert' },
+      })
       setError('We could not submit that right now — please try again, or use the contact page.')
     }
   }

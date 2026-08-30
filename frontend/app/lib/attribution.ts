@@ -14,12 +14,24 @@ export const PRIVACY_POLICY_VERSION = 'v1'
 /** Recorded when a visitor submits a form under the privacy notice. */
 export const CONSENT_FORM_SUBMISSION = 'privacy_policy_acknowledged'
 
-type StoredAttribution = {
+export type StoredAttribution = {
   utm_source?: string
   utm_medium?: string
   utm_campaign?: string
   referrer?: string
   landing_page?: string
+}
+
+/** First-touch attribution captured by initAttribution (may be empty). */
+export function getStoredAttribution(): StoredAttribution {
+  if (typeof window === 'undefined') return {}
+  const storage = safeSessionStorage()
+  if (!storage) return {}
+  try {
+    return JSON.parse(storage.getItem(STORAGE_KEY) || '{}') as StoredAttribution
+  } catch {
+    return {}
+  }
 }
 
 function safeSessionStorage(): Storage | null {

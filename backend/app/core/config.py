@@ -35,6 +35,23 @@ class Settings(BaseSettings):
     excel_sync_max_attempts: int = 8
     excel_sync_poll_seconds: int = 30
 
+    # Analytics ingestion hardening.
+    analytics_rate_limit_per_minute: int = 120
+    analytics_payload_max_bytes: int = 8192
+
+    # Daily activity report (Supabase -> reporting query -> Resend email).
+    report_enabled: bool = False
+    report_recipients: str = ""  # comma-separated
+    report_from_email: str = "GFF AI Reports <reports@gffai.ai>"
+    report_timezone: str = "Asia/Kolkata"
+    report_send_hour: int = 23  # local to report_timezone
+    report_send_minute: int = 55
+    report_max_attempts: int = 5
+    report_poll_seconds: int = 60
+    daily_report_secret: str | None = None  # protects the manual trigger endpoint
+    report_test_recipient: str | None = None  # the ONLY address test reports may go to
+    admin_dashboard_url: str | None = None  # linked from the report email when set
+
     secret_key: str = "dev-secret-change-me"
     redis_url: str | None = None
     email_provider: str | None = None
@@ -56,6 +73,9 @@ class Settings(BaseSettings):
         extra="ignore",
         case_sensitive=False,
     )
+
+    def report_recipient_list(self) -> list[str]:
+        return [item.strip() for item in self.report_recipients.split(",") if item.strip()]
 
     @field_validator("backend_cors_origins", mode="before")
     @classmethod

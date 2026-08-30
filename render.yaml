@@ -50,6 +50,18 @@ services:
         sync: false
       - key: GFF_PORTAL_DEMO_PASSWORD
         sync: false
+      - key: REPORT_ENABLED
+        sync: false
+      - key: REPORT_RECIPIENTS
+        sync: false
+      - key: REPORT_FROM_EMAIL
+        sync: false
+      - key: REPORT_TIMEZONE
+        value: Asia/Kolkata
+      - key: DAILY_REPORT_SECRET
+        sync: false
+      - key: REPORT_TEST_RECIPIENT
+        sync: false
       - key: REDIS_URL
         sync: false
       - key: EMAIL_PROVIDER

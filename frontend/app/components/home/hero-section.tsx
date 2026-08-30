@@ -70,13 +70,13 @@ export function HeroSection() {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="mt-9 flex flex-wrap items-center justify-center gap-3 lg:justify-start"
           >
-            <BrandButton href="#talk-to-agent" size="lg">
+            <BrandButton href="#talk-to-agent" size="lg" cta="hero_talk_to_gff_ai">
               Talk to GFF AI
             </BrandButton>
-            <BrandButton href="#blueprint" variant="secondary" size="lg">
+            <BrandButton href="#blueprint" variant="secondary" size="lg" cta="hero_generate_blueprint">
               Generate Blueprint
             </BrandButton>
-            <BrandButton href="#interactive-experience" variant="secondary" size="lg">
+            <BrandButton href="#interactive-experience" variant="secondary" size="lg" cta="hero_explore_platform">
               Explore Platform
             </BrandButton>
           </motion.div>

@@ -18,6 +18,7 @@ from app.api.v1 import (
     leads,
     portal,
     platforms,
+    reports,
     resources,
     search,
     support,
@@ -27,6 +28,7 @@ api_router = APIRouter()
 api_router.include_router(health.router)
 api_router.include_router(agents.router)
 api_router.include_router(analytics.router)
+api_router.include_router(reports.router)
 api_router.include_router(blueprint.router)
 api_router.include_router(leads.router)
 api_router.include_router(contact.router)
