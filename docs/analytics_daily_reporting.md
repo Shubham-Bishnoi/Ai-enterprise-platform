@@ -15,7 +15,7 @@ Website (Next.js on Vercel)
   → report metrics service  (previous IST calendar day, Python aggregation)
   → daily scheduler  (in-process loop @ 23:55 Asia/Kolkata, plus a
                       secret-protected HTTP trigger as external-cron backup)
-  → Resend  → ashish.chandra@gff.gffai.ai, malvika.singh@gffai.ai
+  → Resend  → ashish.chandra@gffai.ai, malvika.singh@gffai.ai
   → daily_report_runs  (unique per report_date+timezone → no duplicate emails)
 ```
 
@@ -23,11 +23,6 @@ Supabase remains the source of truth. Existing tables are reused, not
 duplicated: `leads` + `lead_submissions` stay authoritative for every
 conversion journey (blueprint, talk-to-agent, contact, consultation,
 workshop, proposal, human handoff); analytics rows only reference them.
-
-> **⚠️ Recipient check before go-live**: `ashish.chandra@gff.gffai.ai`
-> contains `gff` twice (`gff.gffai.ai`). Confirm this is the real mailbox —
-> it may be a typo for `ashish.chandra@gffai.ai`. It is configured via
-> `REPORT_RECIPIENTS`, so fixing it is an env-var change, not a code change.
 
 ## Privacy rules enforced
 
