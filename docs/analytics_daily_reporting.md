@@ -15,7 +15,8 @@ Website (Next.js on Vercel)
   → report metrics service  (previous IST calendar day, Python aggregation)
   → daily scheduler  (in-process loop @ 23:55 Asia/Kolkata, plus a
                       secret-protected HTTP trigger as external-cron backup)
-  → Resend  → ashish.chandra@gffai.ai, malvika.singh@gffai.ai
+  → Resend  → ashish.chandra@gffai.ai, malvika.singh@gffai.ai,
+              shubhambis9oi@gmail.com
   → daily_report_runs  (unique per report_date+timezone → no duplicate emails)
 ```
 
